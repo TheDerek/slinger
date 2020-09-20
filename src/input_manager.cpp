@@ -27,7 +27,6 @@ void InputManager::handleInput(entt::registry& registry) {
             }
 
             if (kv.second == InputAction::WALK_RIGHT && walkDir) {
-                std::cout << "Heyo!" << kv.first << std::endl;
                 walkDir->value += 1;
             }
 
