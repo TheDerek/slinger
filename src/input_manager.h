@@ -8,6 +8,7 @@
 #include <SFML/Window.hpp>
 #include <unordered_map>
 #include <entt/entity/registry.hpp>
+#include <set>
 
 enum class InputAction {
     WALK_RIGHT,
@@ -15,14 +16,20 @@ enum class InputAction {
     JUMP
 };
 
+enum class UIAction {
+    CLOSE_GAME,
+    NO_ACTION
+};
+
 using InputComponent = std::unordered_map<sf::Keyboard::Key, InputAction>;
 
 class InputManager {
 public:
     InputManager(sf::Window& window);
-    void handleInput(entt::registry&);
+    UIAction handleInput(entt::registry&, sf::Window&);
 private:
     sf::Window& window_;
+    std::set<sf::Keyboard::Key> firstTimeKeyPresses_;
 
 };
 

@@ -11,6 +11,7 @@
 
 #include <box2d/box2d.h>
 #include <SFML/Graphics/Shape.hpp>
+#include "misc_components.h"
 
 struct BodyDeleter
 {
@@ -51,7 +52,8 @@ public:
     Fixture makeFixture(sf::Shape* shape,  entt::registry& reg, entt::entity body);
     void createJoint(const b2JointDef&);
 
-    void walkRight(entt::registry&, entt::entity);
+private:
+    void manageWalking(b2Body& body, Movement &walkDir);
 };
 
 

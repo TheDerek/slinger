@@ -14,7 +14,7 @@
 using Drawable = std::unique_ptr<sf::Shape>;
 
 
-Physics::Physics() : world_(b2Vec2(0, -98.f)) {}
+Physics::Physics() : world_(b2Vec2(0, -200.f)) {}
 
 const float Physics::TIME_STEP = 1 / 60.f;
 
@@ -22,14 +22,11 @@ void Physics::handlePhysics(entt::registry &registry, float delta) {
     world_.Step(TIME_STEP, 6, 18);
 
     registry.view<Fixture>().each(
-            [delta, &registry](const auto entity, Fixture &fixture) {
+            [delta, &registry, this](const auto entity, Fixture &fixture) {
                 b2Body *body = fixture.value->GetBody();
 
-                if (WalkDir *walkDir = registry.try_get<WalkDir>(entity)) {
-                    bool walking = walkDir->value != 0;
-                    body->SetFixedRotation(!walking);
-                    body->ApplyAngularImpulse(-40000 * delta * walkDir->value, false);
-                    body->GetFixtureList()->SetFriction(walking ? 0.5 : 5.f);
+                if (Movement *walkDir = registry.try_get<Movement>(entity)) {
+                    this->manageWalking(*body, *walkDir);
                 }
 
                 if (Drawable *drawable = registry.try_get<Drawable>(entity)) {
@@ -123,13 +120,33 @@ void Physics::createJoint(const b2JointDef &jointDef) {
     world_.CreateJoint(&jointDef);
 }
 
-void Physics::walkRight(entt::registry &registry, entt::entity entity) {
-    if (!registry.has<BodyPtr>(entity)) {
-        throw std::runtime_error("Entity has to have a body in order to move");
+void Physics::manageWalking(b2Body &body, Movement& walkDir) {
+    // TODO if not floor skip this
+
+    float vel = body.GetLinearVelocity().x;
+    float desiredVel = 0;
+
+    if (walkDir.direction == 0) {
+        desiredVel = vel * walkDir.deceleration;
     }
 
-    BodyPtr &body = registry.get<BodyPtr>(entity);
-    body->ApplyForceToCenter(b2Vec2(100, 0), false);
+    if (walkDir.direction > 0) {
+        desiredVel = b2Min(vel + walkDir.acceleration, walkDir.vel());
+    }
+
+    if (walkDir.direction < 0) {
+        desiredVel = b2Max(vel - walkDir.acceleration, walkDir.vel());
+    }
+
+    float velChange = desiredVel - body.GetLinearVelocity().x;
+    float impulse = body.GetMass() * velChange;
+    body.ApplyLinearImpulseToCenter(b2Vec2(impulse, 0), false);
+
+    if (walkDir.jumping) {
+        std::cout << "Gonna jump!" << std::endl;
+        float impulse = body.GetMass() * walkDir.jumpVel;
+        body.ApplyLinearImpulseToCenter(b2Vec2(0, impulse), false);
+    }
 }
 
 void BodyDeleter::operator()(b2Body *body) const {
