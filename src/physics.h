@@ -26,16 +26,31 @@ struct FixtureDeleter
 using BodyPtr = std::unique_ptr<b2Body, BodyDeleter>;
 using FixturePtr = std::unique_ptr<b2Fixture, FixtureDeleter>;
 
-struct Fixture
+struct FixtureInfo
 {
     FixturePtr value;
     float angleOffset;
     sf::Vector2f posOffset;
+    int numberOfContacts = 0;
+};
+
+using FixtureInfoPtr = std::shared_ptr<FixtureInfo>;
+
+struct FootSensor {
+    FixtureInfoPtr fixture;
+};
+
+
+class ContactListener : public b2ContactListener
+{
+    void BeginContact(b2Contact* contact) override;
+    void EndContact(b2Contact* contact) override;
 };
 
 class Physics
 {
     b2World world_;
+    entt::registry& registry_;
     static const float TIME_STEP;
 
 public:
@@ -44,16 +59,16 @@ public:
     static float toRadians(float deg);
     static float toDegrees(float rad);
 
-    Physics();
+    explicit Physics(entt::registry&);
 
     void handlePhysics(entt::registry &registry, float delta);
 
     BodyPtr makeBody(sf::Vector2f pos, float rot = 0, b2BodyType = b2_dynamicBody);
-    Fixture makeFixture(sf::Shape* shape,  entt::registry& reg, entt::entity body);
+    FixtureInfoPtr makeFixture(sf::Shape* shape,  entt::registry& reg, entt::entity body);
     void createJoint(const b2JointDef&);
 
 private:
-    void manageWalking(b2Body& body, Movement &walkDir);
+    void manageWalking(entt::entity entity, b2Body &body, Movement &walkDir);
 };
 
 

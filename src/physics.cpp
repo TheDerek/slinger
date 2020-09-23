@@ -14,30 +14,34 @@
 using Drawable = std::unique_ptr<sf::Shape>;
 
 
-Physics::Physics() : world_(b2Vec2(0, -200.f)) {}
+Physics::Physics(entt::registry &registry) :
+    registry_(registry),
+    world_(b2Vec2(0, -200.f)) {
+    world_.SetContactListener(new ContactListener());
+}
 
 const float Physics::TIME_STEP = 1 / 60.f;
 
 void Physics::handlePhysics(entt::registry &registry, float delta) {
     world_.Step(TIME_STEP, 6, 18);
 
-    registry.view<Fixture>().each(
-            [delta, &registry, this](const auto entity, Fixture &fixture) {
-                b2Body *body = fixture.value->GetBody();
+    registry.view<FixtureInfoPtr>().each(
+        [delta, &registry, this](const auto entity, const FixtureInfoPtr& fixture) {
+            b2Body *body = fixture->value->GetBody();
 
-                if (Movement *walkDir = registry.try_get<Movement>(entity)) {
-                    this->manageWalking(*body, *walkDir);
-                }
-
-                if (Drawable *drawable = registry.try_get<Drawable>(entity)) {
-                    (*drawable)->setPosition(
-                            body->GetPosition().x,
-                            body->GetPosition().y
-                    );
-
-                    (*drawable)->setRotation((body->GetAngle() * 180.f / 3.145f) + fixture.angleOffset);
-                }
+            if (Movement *walkDir = registry.try_get<Movement>(entity)) {
+                this->manageWalking(entity, *body, *walkDir);
             }
+
+            if (Drawable *drawable = registry.try_get<Drawable>(entity)) {
+                (*drawable)->setPosition(
+                    body->GetPosition().x,
+                    body->GetPosition().y
+                );
+
+                (*drawable)->setRotation((body->GetAngle() * 180.f / 3.145f) + fixture->angleOffset);
+            }
+        }
     );
 }
 
@@ -52,7 +56,7 @@ BodyPtr Physics::makeBody(sf::Vector2f pos, float rot, b2BodyType bodyType) {
     return BodyPtr(world_.CreateBody(&bodyDef));
 }
 
-Fixture Physics::makeFixture(sf::Shape *shape, entt::registry &reg, entt::entity bodyEntity) {
+FixtureInfoPtr Physics::makeFixture(sf::Shape *shape, entt::registry &reg, entt::entity bodyEntity) {
 
     const BodyPtr &body = *reg.try_get<BodyPtr>(bodyEntity);
     assert(body);
@@ -72,8 +76,8 @@ Fixture Physics::makeFixture(sf::Shape *shape, entt::registry &reg, entt::entity
             rect->getSize().x / 2.f,
             rect->getSize().y / 2.f,
             b2Vec2(
-                    shape->getPosition().x,
-                    shape->getPosition().y
+                shape->getPosition().x,
+                shape->getPosition().y
             ),
             shape->getRotation()
         );
@@ -95,13 +99,16 @@ Fixture Physics::makeFixture(sf::Shape *shape, entt::registry &reg, entt::entity
     b2FixtureDef fixtureDef;
     fixtureDef.shape = fixtureShape.get();
     fixtureDef.density = 1.0f;
-    fixtureDef.friction = 0.9f;
+    fixtureDef.friction = 0.1f;
 
-    return Fixture{
+    auto fix = FixtureInfoPtr(new FixtureInfo {
         FixturePtr(body->CreateFixture(&fixtureDef)),
         shape->getRotation(),
         shape->getPosition()
-    };
+    });
+
+    fix->value->SetUserData(static_cast<void *>(fix.get()));
+    return fix;
 }
 
 b2Vec2 Physics::tob2(const sf::Vector2f &vec) {
@@ -120,8 +127,12 @@ void Physics::createJoint(const b2JointDef &jointDef) {
     world_.CreateJoint(&jointDef);
 }
 
-void Physics::manageWalking(b2Body &body, Movement& walkDir) {
-    // TODO if not floor skip this
+void Physics::manageWalking(entt::entity entity, b2Body &body, Movement &walkDir) {
+    const auto *foot = registry_.try_get<FootSensor>(entity);
+
+    if (foot && foot->fixture->numberOfContacts < 1) {
+        return;
+    }
 
     float vel = body.GetLinearVelocity().x;
     float desiredVel = 0;
@@ -144,7 +155,7 @@ void Physics::manageWalking(b2Body &body, Movement& walkDir) {
 
     if (walkDir.jumping) {
         std::cout << "Gonna jump!" << std::endl;
-        float impulse = body.GetMass() * walkDir.jumpVel;
+        impulse = body.GetMass() * walkDir.jumpVel;
         body.ApplyLinearImpulseToCenter(b2Vec2(0, impulse), false);
     }
 }
@@ -155,4 +166,20 @@ void BodyDeleter::operator()(b2Body *body) const {
 
 void FixtureDeleter::operator()(b2Fixture *fixture) const {
     fixture->GetBody()->DestroyFixture(fixture);
+}
+
+void ContactListener::BeginContact(b2Contact *contact) {
+    auto *fixA = static_cast<FixtureInfo *>(contact->GetFixtureA()->GetUserData());
+    auto *fixB = static_cast<FixtureInfo *>(contact->GetFixtureB()->GetUserData());
+
+    fixA->numberOfContacts += 1;
+    fixB->numberOfContacts += 1;
+}
+
+void ContactListener::EndContact(b2Contact *contact) {
+    auto *fixA = static_cast<FixtureInfo *>(contact->GetFixtureA()->GetUserData());
+    auto *fixB = static_cast<FixtureInfo *>(contact->GetFixtureB()->GetUserData());
+
+    fixA->numberOfContacts -= 1;
+    fixB->numberOfContacts -= 1;
 }

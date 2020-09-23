@@ -30,7 +30,7 @@ void create(entt::registry &registry, Physics& physics) {
                         sf::Vector2f(-10, -30),
                         0,
                         b2_staticBody));
-        registry.emplace<Fixture>(entity, physics.makeFixture(rect.get(), registry, entity));
+        registry.emplace<FixtureInfoPtr>(entity, physics.makeFixture(rect.get(), registry, entity));
         registry.emplace<Drawable>(entity, std::move(rect));
     }
 
@@ -50,13 +50,13 @@ void create(entt::registry &registry, Physics& physics) {
                         sf::Vector2f(0, 30),
                         0,
                         b2_staticBody));
-        registry.emplace<Fixture>(entity, physics.makeFixture(rect.get(), registry, entity));
+        registry.emplace<FixtureInfoPtr>(entity, physics.makeFixture(rect.get(), registry, entity));
         registry.emplace<Drawable>(entity, std::move(rect));
     }
 
-    // The rectangle
-    auto player = registry.create();
+    // The rectangle player
     {
+        auto player = registry.create();
         registry.emplace<entt::tag<"player"_hs>>(player);
 
         auto rect = std::make_unique<sf::RectangleShape>(sf::RectangleShape(sf::Vector2f(10, 20)));
@@ -65,7 +65,7 @@ void create(entt::registry &registry, Physics& physics) {
         auto& body = registry.emplace<BodyPtr>(player, physics.makeBody(sf::Vector2f(-20, 0)));
         body->SetFixedRotation(true);
 
-        registry.emplace<Fixture>(player, physics.makeFixture(rect.get(), registry, player));
+        registry.emplace<FixtureInfoPtr>(player, physics.makeFixture(rect.get(), registry, player));
         registry.emplace<Drawable>(player, std::move(rect));
 
         // Add input to this guy
@@ -75,6 +75,17 @@ void create(entt::registry &registry, Physics& physics) {
             {sf::Keyboard::Key::D, InputAction::WALK_RIGHT},
             {sf::Keyboard::Key::Space, InputAction::JUMP}
         });
+
+        // Add the foot sensor
+        auto foot = registry.create();
+        auto footShape = std::make_unique<sf::RectangleShape>(sf::RectangleShape(sf::Vector2f(8, 1)));
+        footShape->setPosition(0, -10);
+        auto& fix = registry.emplace<FixtureInfoPtr>(foot, physics.makeFixture(footShape.get(), registry, player));
+        fix->value->SetSensor(true);
+        registry.emplace<Drawable>(foot, std::move(footShape));
+
+        // Attach the foot sensor to the player
+        registry.emplace<FootSensor>(player, FootSensor{fix});
     }
 }
 
@@ -85,7 +96,7 @@ int main() {
     window.setKeyRepeatEnabled(false);
 
     entt::registry registry;
-    Physics physics;
+    Physics physics(registry);
     Illustrator illustrator(window);
     InputManager inputManager(window);
 
