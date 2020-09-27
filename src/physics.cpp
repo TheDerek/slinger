@@ -29,10 +29,6 @@ void Physics::handlePhysics(entt::registry &registry, float delta) {
         [delta, &registry, this](const auto entity, const FixtureInfoPtr& fixture) {
             b2Body *body = fixture->value->GetBody();
 
-            if (Movement *walkDir = registry.try_get<Movement>(entity)) {
-                this->manageWalking(entity, *body, *walkDir);
-            }
-
             if (Drawable *drawable = registry.try_get<Drawable>(entity)) {
                 (*drawable)->setPosition(
                     body->GetPosition().x,
@@ -43,6 +39,12 @@ void Physics::handlePhysics(entt::registry &registry, float delta) {
             }
         }
     );
+
+    registry.view<BodyPtr>().each(
+        [delta, &registry, this](const auto entity, const BodyPtr& body) {
+        if (Movement *walkDir = registry.try_get<Movement>(entity)) {
+            this->manageWalking(entity, *body, *walkDir);
+        }});
 }
 
 BodyPtr Physics::makeBody(sf::Vector2f pos, float rot, b2BodyType bodyType) {
@@ -164,8 +166,9 @@ void Physics::manageWalking(entt::entity entity, b2Body &body, Movement &walkDir
     }
 }
 
-BodyPtr& Physics::makeBody(entt::entity entity, sf::Vector2f pos, float rot, b2BodyType) {
-    return registry_.emplace<BodyPtr>(entity, makeBody(sf::Vector2f(-20, 0)));
+BodyPtr& Physics::makeBody(entt::entity entity, sf::Vector2f pos, float rot, b2BodyType type) {
+    auto& body = registry_.emplace<BodyPtr>(entity, makeBody(pos, rot, type));
+    return body;
 }
 
 void BodyDeleter::operator()(b2Body *body) const {
