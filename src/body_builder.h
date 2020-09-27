@@ -22,6 +22,7 @@ struct ShapePrototype {
     bool footSensor = false;
     float density = 1;
     float friction = 0.2f;
+    int zIndex = 0;
 };
 
 struct AttachPrototype {
@@ -75,6 +76,7 @@ public:
     ShapeBuilder& setSensor();
     ShapeBuilder& setColor(sf::Color color);
     ShapeBuilder& setFootSensor();
+    ShapeBuilder& setZIndex(int z);
     BodyBuilder& create();
 };
 

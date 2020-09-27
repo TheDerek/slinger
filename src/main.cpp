@@ -44,7 +44,7 @@ void create(entt::registry &registry, Physics &physics) {
         .setPos(-20, 0)
         .setFixedRotation(true)
         .addRect(10, 20)
-            .setColor(sf::Color(100, 250, 50))
+            .setColor(sf::Color(100, 200, 50))
             .makeFixture()
             .draw()
             .create()
@@ -55,6 +55,7 @@ void create(entt::registry &registry, Physics &physics) {
             .makeFixture()
             .setFootSensor()
             .draw()
+            .setZIndex(1)
             .create()
         .create();
 
@@ -66,18 +67,21 @@ void create(entt::registry &registry, Physics &physics) {
             {sf::Keyboard::Key::Space, InputAction::JUMP}
         });
 
+    // The players arm
     BodyBuilder(registry, physics)
         .addRect(3, 10)
-        .setColor(sf::Color(255, 255, 255))
-        .setSensor()
-        .makeFixture()
-        .draw()
-        .create()
-        .attach(player, 0, 8, 0, -5)
+            .setColor(sf::Color(255, 255, 255))
+            .setSensor()
+            .makeFixture()
+            .draw()
+            .setZIndex(1)
+            .create()
+        .attach(player, 0, 7, 0, -4)
         .create();
 
-    // Attach to the player
-
+    registry.sort<Drawable>([](const auto &lhs, const auto &rhs) {
+        return lhs.zIndex < rhs.zIndex;
+    });
 }
 
 int main() {

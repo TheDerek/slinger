@@ -16,19 +16,19 @@ void Illustrator::draw(entt::registry &registry)
 
     registry.view<Drawable>().each(
             [this, &registry](const auto entity, const Drawable &drawable) {
-                auto& pos = drawable->getPosition();
+                auto& pos = drawable.value->getPosition();
 
                 if (registry.has<entt::tag<"wrapView"_hs>>(entity)
                     && absolute(camera_.getCenter() - pos) > absolute(camera_.getSize() / 2.f))
                 {
-                    drawable->setPosition(pos + 2.f * (camera_.getCenter() - pos));
+                    drawable.value->setPosition(pos + 2.f * (camera_.getCenter() - pos));
                 }
 
-                window_.draw(*drawable);
+                window_.draw(*drawable.value);
 
                 if (registry.try_get<Follow>(entity))
                 {
-                    camera_.setCenter(drawable->getPosition());
+                    camera_.setCenter(drawable.value->getPosition());
                 }
             }
     );
@@ -51,14 +51,14 @@ float Illustrator::round(float number, float multiple)
 Drawable Illustrator::makeRectangle(const sf::Vector2f &size, const sf::Vector2f &pos) const
 {
     Drawable d{std::make_unique<sf::RectangleShape>(sf::RectangleShape(size))};
-    d->setPosition(pos);
+    d.value->setPosition(pos);
     return d;
 }
 
 Drawable Illustrator::makeCircle(float radius, const sf::Vector2f &pos) const
 {
     Drawable d{std::make_unique<sf::CircleShape>(sf::CircleShape(radius))};
-    d->setPosition(pos);
+    d.value->setPosition(pos);
     return d;
 }
 

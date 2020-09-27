@@ -61,6 +61,10 @@ ShapeBuilder &ShapeBuilder::setFootSensor() {
     return *this;
 }
 
+ShapeBuilder &ShapeBuilder::setZIndex(int z) {
+    prototype.zIndex = z;
+}
+
 BodyBuilder::BodyBuilder(entt::registry &registry, Physics &physics) :
     registry_(registry),
     physics_(physics) {
@@ -114,7 +118,10 @@ entt::entity BodyBuilder::create() {
         }
 
         if (prototype.draw) {
-            registry_.emplace<Drawable>(shapeEntity, std::move(prototype.shape));
+            registry_.emplace<Drawable>(
+                shapeEntity,
+                Drawable { std::move(prototype.shape), prototype.zIndex }
+            );
         }
     }
 

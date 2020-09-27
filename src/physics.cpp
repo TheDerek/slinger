@@ -8,10 +8,9 @@
 #include <box2d/box2d.h>
 #include <iostream>
 
+#include "illustrator.h"
 #include "physics.h"
 #include "misc_components.h"
-
-using Drawable = std::unique_ptr<sf::Shape>;
 
 
 Physics::Physics(entt::registry &registry) :
@@ -30,12 +29,12 @@ void Physics::handlePhysics(entt::registry &registry, float delta) {
             b2Body *body = fixture->value->GetBody();
 
             if (Drawable *drawable = registry.try_get<Drawable>(entity)) {
-                (*drawable)->setPosition(
+                (*drawable).value->setPosition(
                     body->GetPosition().x,
                     body->GetPosition().y
                 );
 
-                (*drawable)->setRotation((body->GetAngle() * 180.f / 3.145f) + fixture->angleOffset);
+                (*drawable).value->setRotation((body->GetAngle() * 180.f / 3.145f) + fixture->angleOffset);
             }
         }
     );

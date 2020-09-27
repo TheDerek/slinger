@@ -11,7 +11,12 @@
 //TODO: Replace with container struct that has the
 // shape and the Z index which we will use to sort
 // the entities via https://bit.ly/3cA73dw
-using Drawable = std::unique_ptr<sf::Shape>;
+using ShapePtr = std::unique_ptr<sf::Shape>;
+
+struct Drawable {
+    std::unique_ptr<sf::Shape> value;
+    int zIndex = 0;
+};
 
 struct Follow
 {
