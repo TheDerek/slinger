@@ -24,6 +24,14 @@ struct ShapePrototype {
     float friction = 0.2f;
 };
 
+struct AttachPrototype {
+    entt::entity body;
+    float localAnchorAX;
+    float localAnchorAY;
+    float localAnchorBX;
+    float localAnchorBY;
+};
+
 class BodyBuilder {
 private:
     entt::entity entity_;
@@ -34,6 +42,7 @@ private:
     float rot_ = 0;
     bool fixedRotation_ = false;
     std::vector<ShapePrototype> shapes_;
+    std::optional<AttachPrototype> attachPrototype_;
 
 public:
 
@@ -44,6 +53,7 @@ public:
     BodyBuilder &setType(b2BodyType type);
     BodyBuilder &setRot(float rot);
     BodyBuilder &setFixedRotation(bool fixedRotation);
+    BodyBuilder &attach(entt::entity body, float localAnchorAX, float localAnchorAY, float localAnchorBX, float localAnchorBY);
     entt::entity create();
 };
 

@@ -171,6 +171,10 @@ BodyPtr& Physics::makeBody(entt::entity entity, sf::Vector2f pos, float rot, b2B
     return body;
 }
 
+b2World &Physics::getWorld() {
+    return world_;
+}
+
 void BodyDeleter::operator()(b2Body *body) const {
     body->GetWorld()->DestroyBody(body);
 }

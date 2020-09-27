@@ -118,10 +118,33 @@ entt::entity BodyBuilder::create() {
         }
     }
 
+    if (attachPrototype_.has_value()) {
+        b2RevoluteJointDef def;
+        def.localAnchorA = b2Vec2(attachPrototype_.value().localAnchorAX, attachPrototype_.value().localAnchorAY);
+        def.localAnchorB = b2Vec2(attachPrototype_.value().localAnchorBX, attachPrototype_.value().localAnchorBY);
+        def.bodyA = registry_.get<BodyPtr>(attachPrototype_->body).get();
+        def.bodyB = body.get();
+        physics_.getWorld().CreateJoint(&def);
+    }
+
     return entity_;
 }
 
 BodyBuilder &BodyBuilder::addShape(ShapePrototype prototype) {
     shapes_.push_back(std::move(prototype));
+    return *this;
+}
+
+BodyBuilder &BodyBuilder::attach(entt::entity body,
+    float localAnchorAX, float localAnchorAY,
+    float localAnchorBX, float localAnchorBY) {
+    attachPrototype_ = AttachPrototype {
+      body,
+      localAnchorAX,
+      localAnchorAY,
+      localAnchorBX,
+      localAnchorBY
+    };
+
     return *this;
 }

@@ -49,6 +49,7 @@ class ContactListener : public b2ContactListener
 
 class Physics
 {
+private:
     b2World world_;
     entt::registry& registry_;
     static const float TIME_STEP;
@@ -58,6 +59,7 @@ public:
     static b2Vec2 tob2(const sf::Vector2f& vec);
     static float toRadians(float deg);
     static float toDegrees(float rad);
+    b2World &getWorld();
 
     explicit Physics(entt::registry&);
 

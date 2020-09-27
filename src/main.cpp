@@ -65,6 +65,19 @@ void create(entt::registry &registry, Physics &physics) {
             {sf::Keyboard::Key::D, InputAction::WALK_RIGHT},
             {sf::Keyboard::Key::Space, InputAction::JUMP}
         });
+
+    BodyBuilder(registry, physics)
+        .addRect(3, 10)
+        .setColor(sf::Color(255, 255, 255))
+        .setSensor()
+        .makeFixture()
+        .draw()
+        .create()
+        .attach(player, 0, 8, 0, -5)
+        .create();
+
+    // Attach to the player
+
 }
 
 int main() {
