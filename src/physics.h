@@ -64,7 +64,10 @@ public:
     void handlePhysics(entt::registry &registry, float delta);
 
     BodyPtr makeBody(sf::Vector2f pos, float rot = 0, b2BodyType = b2_dynamicBody);
+    BodyPtr & makeBody(entt::entity entity, sf::Vector2f pos, float rot = 0, b2BodyType = b2_dynamicBody);
     FixtureInfoPtr makeFixture(sf::Shape* shape,  entt::registry& reg, entt::entity body);
+    FixtureInfoPtr& makeFixture(entt::entity, sf::Shape*,  entt::registry&, entt::entity body);
+
     void createJoint(const b2JointDef&);
 
 private:

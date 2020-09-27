@@ -4,7 +4,7 @@ project(slinger)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(slinger src/main.cpp src/physics.cpp src/physics.h src/illustrator.cpp src/illustrator.h src/input_manager.cpp src/input_manager.h src/misc_components.h)
+add_executable(slinger src/main.cpp src/physics.cpp src/physics.h src/illustrator.cpp src/illustrator.h src/input_manager.cpp src/input_manager.h src/misc_components.h src/body_builder.cpp src/body_builder.h)
 
 find_package(box2d REQUIRED)
 find_package(SFML 2.5 COMPONENTS graphics audio system window REQUIRED)

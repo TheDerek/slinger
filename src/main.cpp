@@ -8,6 +8,7 @@
 #include "illustrator.h"
 #include "input_manager.h"
 #include "misc_components.h"
+#include "body_builder.h"
 
 sf::Color WHITE = sf::Color(255, 255, 255);
 
@@ -15,7 +16,7 @@ struct Position {
     sf::Vector2f value;
 };
 
-void create(entt::registry &registry, Physics& physics) {
+void create(entt::registry &registry, Physics &physics) {
     // The floor
     {
         auto entity = registry.create();
@@ -25,11 +26,12 @@ void create(entt::registry &registry, Physics& physics) {
         rect->setFillColor(sf::Color(255, 100, 50));
 
         registry.emplace<BodyPtr>(
-                entity,
-                physics.makeBody(
-                        sf::Vector2f(-10, -30),
-                        0,
-                        b2_staticBody));
+            entity,
+            physics.makeBody(
+                sf::Vector2f(-10, -30),
+                0,
+                b2_staticBody
+            ));
         registry.emplace<FixtureInfoPtr>(entity, physics.makeFixture(rect.get(), registry, entity));
         registry.emplace<Drawable>(entity, std::move(rect));
     }
@@ -45,11 +47,12 @@ void create(entt::registry &registry, Physics& physics) {
         rect->setFillColor(sf::Color(255, 100, 50));
 
         registry.emplace<BodyPtr>(
-                entity,
-                physics.makeBody(
-                        sf::Vector2f(0, 30),
-                        0,
-                        b2_staticBody));
+            entity,
+            physics.makeBody(
+                sf::Vector2f(0, 30),
+                0,
+                b2_staticBody
+            ));
         registry.emplace<FixtureInfoPtr>(entity, physics.makeFixture(rect.get(), registry, entity));
         registry.emplace<Drawable>(entity, std::move(rect));
     }
@@ -62,7 +65,7 @@ void create(entt::registry &registry, Physics& physics) {
         auto rect = std::make_unique<sf::RectangleShape>(sf::RectangleShape(sf::Vector2f(10, 20)));
         rect->setFillColor(sf::Color(100, 250, 50));
 
-        auto& body = registry.emplace<BodyPtr>(player, physics.makeBody(sf::Vector2f(-20, 0)));
+        auto &body = registry.emplace<BodyPtr>(player, physics.makeBody(sf::Vector2f(-20, 0)));
         body->SetFixedRotation(true);
 
         registry.emplace<FixtureInfoPtr>(player, physics.makeFixture(rect.get(), registry, player));
@@ -70,22 +73,31 @@ void create(entt::registry &registry, Physics& physics) {
 
         // Add input to this guy
         registry.emplace<Movement>(player, Movement{});
-        registry.emplace<InputComponent>(player, InputComponent {
-            {sf::Keyboard::Key::A, InputAction::WALK_LEFT},
-            {sf::Keyboard::Key::D, InputAction::WALK_RIGHT},
-            {sf::Keyboard::Key::Space, InputAction::JUMP}
-        });
+        registry.emplace<InputComponent>(
+            player, InputComponent{
+                {sf::Keyboard::Key::A, InputAction::WALK_LEFT},
+                {sf::Keyboard::Key::D, InputAction::WALK_RIGHT},
+                {sf::Keyboard::Key::Space, InputAction::JUMP}
+            }
+        );
 
         // Add the foot sensor
         auto foot = registry.create();
         auto footShape = std::make_unique<sf::RectangleShape>(sf::RectangleShape(sf::Vector2f(8, 1)));
         footShape->setPosition(0, -10);
-        auto& fix = registry.emplace<FixtureInfoPtr>(foot, physics.makeFixture(footShape.get(), registry, player));
+        auto &fix = registry.emplace<FixtureInfoPtr>(foot, physics.makeFixture(footShape.get(), registry, player));
         fix->value->SetSensor(true);
         registry.emplace<Drawable>(foot, std::move(footShape));
 
         // Attach the foot sensor to the player
         registry.emplace<FootSensor>(player, FootSensor{fix});
+
+        // Add the players arm
+        BodyBuilder(registry, physics)
+            .addRect(3, 10, 0, 0, 0, true, true, true, 1, 0.3f)
+            .setPos(8, 0)
+            .create();
+
     }
 }
 

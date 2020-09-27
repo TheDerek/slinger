@@ -58,7 +58,7 @@ BodyPtr Physics::makeBody(sf::Vector2f pos, float rot, b2BodyType bodyType) {
 
 FixtureInfoPtr Physics::makeFixture(sf::Shape *shape, entt::registry &reg, entt::entity bodyEntity) {
 
-    const BodyPtr &body = *reg.try_get<BodyPtr>(bodyEntity);
+    const BodyPtr* body = reg.try_get<BodyPtr>(bodyEntity);
     assert(body);
 
     auto *rect = dynamic_cast<sf::RectangleShape *>(shape);
@@ -99,16 +99,20 @@ FixtureInfoPtr Physics::makeFixture(sf::Shape *shape, entt::registry &reg, entt:
     b2FixtureDef fixtureDef;
     fixtureDef.shape = fixtureShape.get();
     fixtureDef.density = 1.0f;
-    fixtureDef.friction = 0.1f;
+    fixtureDef.friction = 0.0f;
 
     auto fix = FixtureInfoPtr(new FixtureInfo {
-        FixturePtr(body->CreateFixture(&fixtureDef)),
+        FixturePtr((*body)->CreateFixture(&fixtureDef)),
         shape->getRotation(),
         shape->getPosition()
     });
 
     fix->value->SetUserData(static_cast<void *>(fix.get()));
     return fix;
+}
+
+FixtureInfoPtr &Physics::makeFixture(entt::entity entity, sf::Shape *shape, entt::registry &reg, entt::entity body) {
+    return registry_.emplace<FixtureInfoPtr>(entity, makeFixture(shape, registry_, body));
 }
 
 b2Vec2 Physics::tob2(const sf::Vector2f &vec) {
@@ -158,6 +162,10 @@ void Physics::manageWalking(entt::entity entity, b2Body &body, Movement &walkDir
         impulse = body.GetMass() * walkDir.jumpVel;
         body.ApplyLinearImpulseToCenter(b2Vec2(0, impulse), false);
     }
+}
+
+BodyPtr& Physics::makeBody(entt::entity entity, sf::Vector2f pos, float rot, b2BodyType) {
+    return registry_.emplace<BodyPtr>(entity, makeBody(sf::Vector2f(-20, 0)));
 }
 
 void BodyDeleter::operator()(b2Body *body) const {
