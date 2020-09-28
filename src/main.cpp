@@ -41,7 +41,7 @@ void create(entt::registry &registry, Physics &physics) {
 
     // The rectangle player
     auto player = BodyBuilder(registry, physics)
-        .setPos(-20, 0)
+        .setPos(0, 0)
         .setFixedRotation(true)
         .addRect(10, 20)
             .setColor(sf::Color(100, 200, 50))
@@ -59,26 +59,38 @@ void create(entt::registry &registry, Physics &physics) {
             .create()
         .create();
 
+    // Add movement to player
     registry.emplace<Movement>(player);
     registry.emplace<InputComponent>(
-        player, InputComponent{
+        player, InputComponent {
             {sf::Keyboard::Key::A, InputAction::WALK_LEFT},
             {sf::Keyboard::Key::D, InputAction::WALK_RIGHT},
             {sf::Keyboard::Key::Space, InputAction::JUMP}
         });
 
     // The players arm
-    BodyBuilder(registry, physics)
+    auto arm = BodyBuilder(registry, physics)
         .addRect(3, 10)
             .setColor(sf::Color(255, 255, 255))
             .setSensor()
             .makeFixture()
             .draw()
             .setZIndex(1)
+            .setDensity(0)
+            .setPos(0, 4)
             .create()
-        .attach(player, 0, 7, 0, -4)
+        .attach(player, 0, 7, 0, 0)
+        .setFixedRotation(true)
+        .setPos(0, 0)
         .create();
 
+    // Add arm inputs
+    registry.emplace<entt::tag<"rotate_to_mouse"_hs>>(arm);
+    registry.emplace<InputComponent>(arm, InputComponent {
+        {sf::Mouse::Left, InputAction::FIRE_ROPE}
+    });
+
+    // Sort drawable entities by z index
     registry.sort<Drawable>([](const auto &lhs, const auto &rhs) {
         return lhs.zIndex < rhs.zIndex;
     });
@@ -107,8 +119,11 @@ int main() {
         // Clear screen
         window.clear(WHITE);
 
+        // Get the mouse pos
+        sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+
         auto delta = deltaClock.restart();
-        physics.handlePhysics(registry, delta.asSeconds());
+        physics.handlePhysics(registry, delta.asSeconds(), mousePos);
         illustrator.draw(registry);
 
         // Update the window

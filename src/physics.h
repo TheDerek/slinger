@@ -63,7 +63,7 @@ public:
 
     explicit Physics(entt::registry&);
 
-    void handlePhysics(entt::registry &registry, float delta);
+    void handlePhysics(entt::registry &registry, float delta, const sf::Vector2f &mousePos);
 
     BodyPtr makeBody(sf::Vector2f pos, float rot = 0, b2BodyType = b2_dynamicBody);
     BodyPtr & makeBody(entt::entity entity, sf::Vector2f pos, float rot = 0, b2BodyType = b2_dynamicBody);
@@ -74,6 +74,8 @@ public:
 
 private:
     void manageWalking(entt::entity entity, b2Body &body, Movement &walkDir);
+
+    void rotateToMouse(b2Body &body, const sf::Vector2f &mousePos);
 };
 
 

@@ -21,7 +21,7 @@ Physics::Physics(entt::registry &registry) :
 
 const float Physics::TIME_STEP = 1 / 60.f;
 
-void Physics::handlePhysics(entt::registry &registry, float delta) {
+void Physics::handlePhysics(entt::registry &registry, float delta, const sf::Vector2f &mousePos) {
     world_.Step(TIME_STEP, 6, 18);
 
     registry.view<FixtureInfoPtr>().each(
@@ -40,10 +40,16 @@ void Physics::handlePhysics(entt::registry &registry, float delta) {
     );
 
     registry.view<BodyPtr>().each(
-        [delta, &registry, this](const auto entity, const BodyPtr& body) {
+        [delta, mousePos, &registry, this](const auto entity, const BodyPtr& body) {
         if (Movement *walkDir = registry.try_get<Movement>(entity)) {
             this->manageWalking(entity, *body, *walkDir);
-        }});
+        }
+
+        if (registry.has<entt::tag<"rotate_to_mouse"_hs>>(entity)) {
+            this->rotateToMouse(*body, mousePos);
+        }
+    });
+
 }
 
 BodyPtr Physics::makeBody(sf::Vector2f pos, float rot, b2BodyType bodyType) {
@@ -172,6 +178,12 @@ BodyPtr& Physics::makeBody(entt::entity entity, sf::Vector2f pos, float rot, b2B
 
 b2World &Physics::getWorld() {
     return world_;
+}
+
+void Physics::rotateToMouse(b2Body &body, const sf::Vector2f &mousePos) {
+    b2Vec2 toTarget = tob2(mousePos) - body.GetPosition();
+    float desiredAngle = atan2f( -toTarget.x, toTarget.y );
+    body.SetTransform(body.GetPosition(), desiredAngle);
 }
 
 void BodyDeleter::operator()(b2Body *body) const {

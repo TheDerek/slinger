@@ -131,6 +131,8 @@ entt::entity BodyBuilder::create() {
         def.localAnchorB = b2Vec2(attachPrototype_.value().localAnchorBX, attachPrototype_.value().localAnchorBY);
         def.bodyA = registry_.get<BodyPtr>(attachPrototype_->body).get();
         def.bodyB = body.get();
+        def.collideConnected = false;
+        def.enableLimit = false;
         physics_.getWorld().CreateJoint(&def);
     }
 
