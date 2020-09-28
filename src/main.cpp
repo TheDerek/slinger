@@ -81,14 +81,10 @@ void create(entt::registry &registry, Physics &physics) {
             .create()
         .attach(player, 0, 7, 0, 0)
         .setFixedRotation(true)
-        .setPos(0, 0)
         .create();
 
     // Add arm inputs
     registry.emplace<entt::tag<"rotate_to_mouse"_hs>>(arm);
-    registry.emplace<InputComponent>(arm, InputComponent {
-        {sf::Mouse::Left, InputAction::FIRE_ROPE}
-    });
 
     // Sort drawable entities by z index
     registry.sort<Drawable>([](const auto &lhs, const auto &rhs) {
