@@ -9,11 +9,13 @@
 #include <unordered_map>
 #include <entt/entity/registry.hpp>
 #include <set>
+#include <variant>
 
 enum class InputAction {
     WALK_RIGHT,
     WALK_LEFT,
-    JUMP
+    JUMP,
+    FIRE_ROPE
 };
 
 enum class UIAction {
@@ -21,7 +23,7 @@ enum class UIAction {
     NO_ACTION
 };
 
-using InputComponent = std::unordered_map<sf::Keyboard::Key, InputAction>;
+using InputComponent = std::unordered_map<std::variant<sf::Keyboard::Key, sf::Mouse::Button>, InputAction>;
 
 class InputManager {
 public:

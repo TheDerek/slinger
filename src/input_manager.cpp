@@ -23,42 +23,33 @@ UIAction InputManager::handleInput(entt::registry &registry, sf::Window &window)
             return UIAction::CLOSE_GAME;
         }
 
-        // Close window: exit
         if (event.type == sf::Event::KeyPressed) {
             firstTimeKeyPresses_.insert(event.key.code);
         }
     }
 
-    // Handle input for individual entities
-    auto view = registry.view<InputComponent>();
-    for (auto entity : view) {
-        Movement *walkDir = registry.try_get<Movement>(entity);
-
-        if (!walkDir) {
-            continue;
-        }
-
-        walkDir->direction = 0;
-        walkDir->jumping = false;
-
+    // Handle walking
+    registry.view<InputComponent, Movement>().each(
+        [&registry, this](const auto entity, const InputComponent& input, Movement& movement) {
         for (const auto &kv : registry.get<InputComponent>(entity)) {
+
             if (!(sf::Keyboard::isKeyPressed(kv.first) || firstTimeKeyPresses_.contains(kv.first))) {
                 continue;
             }
 
             if (kv.second == InputAction::WALK_RIGHT) {
-                walkDir->direction += 1;
+                movement.direction += 1;
             }
 
             if (kv.second == InputAction::WALK_LEFT) {
-                walkDir->direction -= 1;
+                movement.direction -= 1;
             }
 
             if (kv.second == InputAction::JUMP && firstTimeKeyPresses_.contains(kv.first)) {
-                walkDir->jumping = true;
+                movement.jumping = true;
             }
         }
-    }
+    });
 
     return UIAction::NO_ACTION;
 }
