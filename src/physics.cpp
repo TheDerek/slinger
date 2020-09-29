@@ -41,8 +41,8 @@ void Physics::handlePhysics(entt::registry &registry, float delta, const sf::Vec
 
     registry.view<BodyPtr>().each(
         [delta, mousePos, &registry, this](const auto entity, const BodyPtr& body) {
-        if (Movement *walkDir = registry.try_get<Movement>(entity)) {
-            this->manageWalking(entity, *body, *walkDir);
+        if (Movement *movement = registry.try_get<Movement>(entity)) {
+            this->manageMovement(entity, *body, *movement);
         }
 
         if (registry.has<entt::tag<"rotate_to_mouse"_hs>>(entity)) {
@@ -138,37 +138,42 @@ void Physics::createJoint(const b2JointDef &jointDef) {
     world_.CreateJoint(&jointDef);
 }
 
-void Physics::manageWalking(entt::entity entity, b2Body &body, Movement &walkDir) {
+void Physics::manageMovement(entt::entity entity, b2Body &body, Movement &movement) {
     const auto *foot = registry_.try_get<FootSensor>(entity);
 
     if (foot && foot->fixture->numberOfContacts < 1) {
+        movement.direction = 0;
+        movement.jumping = false;
         return;
     }
 
     float vel = body.GetLinearVelocity().x;
     float desiredVel = 0;
 
-    if (walkDir.direction == 0) {
-        desiredVel = vel * walkDir.deceleration;
+    if (movement.direction == 0) {
+        desiredVel = vel * movement.deceleration;
     }
 
-    if (walkDir.direction > 0) {
-        desiredVel = b2Min(vel + walkDir.acceleration, walkDir.vel());
+    if (movement.direction > 0) {
+        desiredVel = b2Min(vel + movement.acceleration, movement.vel());
     }
 
-    if (walkDir.direction < 0) {
-        desiredVel = b2Max(vel - walkDir.acceleration, walkDir.vel());
+    if (movement.direction < 0) {
+        desiredVel = b2Max(vel - movement.acceleration, movement.vel());
     }
 
     float velChange = desiredVel - body.GetLinearVelocity().x;
     float impulse = body.GetMass() * velChange;
     body.ApplyLinearImpulseToCenter(b2Vec2(impulse, 0), false);
 
-    if (walkDir.jumping) {
+    if (movement.jumping) {
         std::cout << "Gonna jump!" << std::endl;
-        impulse = body.GetMass() * walkDir.jumpVel;
+        impulse = body.GetMass() * movement.jumpVel;
         body.ApplyLinearImpulseToCenter(b2Vec2(0, impulse), false);
     }
+
+    movement.direction = 0;
+    movement.jumping = false;
 }
 
 BodyPtr& Physics::makeBody(entt::entity entity, sf::Vector2f pos, float rot, b2BodyType type) {

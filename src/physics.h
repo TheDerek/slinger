@@ -73,7 +73,7 @@ public:
     void createJoint(const b2JointDef&);
 
 private:
-    void manageWalking(entt::entity entity, b2Body &body, Movement &walkDir);
+    void manageMovement(entt::entity entity, b2Body &body, Movement &movement);
 
     void rotateToMouse(b2Body &body, const sf::Vector2f &mousePos);
 };
