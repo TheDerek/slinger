@@ -65,7 +65,7 @@ void create(entt::registry &registry, Physics &physics) {
         player, InputComponent {
             {sf::Keyboard::Key::A, InputAction::WALK_LEFT},
             {sf::Keyboard::Key::D, InputAction::WALK_RIGHT},
-            {sf::Keyboard::Key::Space, InputAction::JUMP}
+            {JustPressedKey { sf::Keyboard::Key::Space }, InputAction::JUMP}
         });
 
     // The players arm
@@ -77,7 +77,7 @@ void create(entt::registry &registry, Physics &physics) {
             .draw()
             .setZIndex(1)
             .setDensity(0)
-            .setPos(0, 4)
+            .setPos(0, 3.5f)
             .create()
         .attach(player, 0, 7, 0, 0)
         .setFixedRotation(true)

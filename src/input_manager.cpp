@@ -13,6 +13,7 @@ InputManager::InputManager(sf::Window &window) : window_(window) {
 UIAction InputManager::handleInput(entt::registry &registry, sf::Window &window) {
     // Remove all key releases from the previous frame
     firstTimeKeyPresses_.clear();
+    firstTimeButtonPresses_.clear();
 
     // Process events
     sf::Event event;
@@ -23,33 +24,66 @@ UIAction InputManager::handleInput(entt::registry &registry, sf::Window &window)
             return UIAction::CLOSE_GAME;
         }
 
+        // Any any one time key presses to the just key pressed list
         if (event.type == sf::Event::KeyPressed) {
             firstTimeKeyPresses_.insert(event.key.code);
+        }
+
+        // Any any one time key presses to the just key pressed list
+        if (event.type == sf::Event::MouseButtonPressed) {
+            firstTimeButtonPresses_.insert(event.mouseButton.button);
         }
     }
 
     // Handle walking
-    registry.view<InputComponent, Movement>().each(
-        [&registry, this](const auto entity, const InputComponent& input, Movement& movement) {
+    auto view = registry.view<InputComponent>();
+    for (auto entity : view) {
         for (const auto &kv : registry.get<InputComponent>(entity)) {
-
-            if (!(sf::Keyboard::isKeyPressed(kv.first) || firstTimeKeyPresses_.contains(kv.first))) {
+            if(!std::visit(*this, kv.first)) {
                 continue;
             }
 
-            if (kv.second == InputAction::WALK_RIGHT) {
-                movement.direction += 1;
+            InputAction action = kv.second;
+
+            if (Movement* movement = registry.try_get<Movement>(entity)) {
+                handleMovement(action, *movement);
             }
 
-            if (kv.second == InputAction::WALK_LEFT) {
-                movement.direction -= 1;
-            }
-
-            if (kv.second == InputAction::JUMP && firstTimeKeyPresses_.contains(kv.first)) {
-                movement.jumping = true;
+            if (action == InputAction::FIRE_ROPE) {
+                std::cout << "Firing a rope!" << std::endl;
             }
         }
-    });
+    }
 
     return UIAction::NO_ACTION;
+}
+
+bool InputManager::operator() (sf::Keyboard::Key key) const {
+    return sf::Keyboard::isKeyPressed(key);
+}
+
+bool InputManager::operator() (sf::Mouse::Button button) const {
+    return sf::Mouse::isButtonPressed(button);
+}
+
+bool InputManager::operator() (JustPressedKey key) const {
+    return firstTimeKeyPresses_.contains(key.value);
+}
+
+void InputManager::handleMovement(InputAction action, Movement& movement) {
+    if (action == InputAction::WALK_RIGHT) {
+        movement.direction += 1;
+    }
+
+    if (action == InputAction::WALK_LEFT) {
+        movement.direction -= 1;
+    }
+
+    if (action == InputAction::JUMP) {
+        movement.jumping = true;
+    }
+}
+
+bool operator==(const JustPressedKey &lhs, const JustPressedKey &rhs) {
+    return lhs.value == rhs.value;
 }
