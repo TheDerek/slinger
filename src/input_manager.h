@@ -24,26 +24,32 @@ enum class UIAction {
     NO_ACTION
 };
 
+template <class T>
+struct JustPressed {
+    T value;
 
-struct JustPressedKey {
-    sf::Keyboard::Key value;
-
-    friend bool operator== (const JustPressedKey& lhs, const JustPressedKey& rhs);
+    explicit JustPressed(T newValue) {
+        value = newValue;
+    }
 };
 
-
 namespace std {
-    template <> struct hash<JustPressedKey>
+    template <class T> struct hash<JustPressed<T>>
     {
-        size_t operator()(const JustPressedKey& x) const
+        size_t operator()(const JustPressed<T>& x) const
         {
-            return hash<int>()(x.value);
+            return hash<T>()(x.value);
         }
     };
 }
 
+template <class T>
+bool operator==(const JustPressed<T> &lhs, const JustPressed<T> &rhs) {
+    return lhs.value == rhs.value;
+}
 
-using InputButton = std::variant<JustPressedKey, sf::Keyboard::Key, sf::Mouse::Button>;
+
+using InputButton = std::variant<sf::Keyboard::Key, JustPressed<sf::Keyboard::Key>, JustPressed<sf::Mouse::Button>>;
 using InputComponent = std::unordered_map<InputButton, InputAction>;
 
 class InputManager {
@@ -54,7 +60,9 @@ public:
 
     bool operator() (sf::Keyboard::Key) const;
     bool operator() (sf::Mouse::Button) const;
-    bool operator() (JustPressedKey) const;
+    bool operator() (JustPressed<sf::Keyboard::Key>) const;
+    bool operator() (JustPressed<sf::Mouse::Button>) const;
+
 private:
     sf::Window& window_;
     std::set<sf::Keyboard::Key> firstTimeKeyPresses_;

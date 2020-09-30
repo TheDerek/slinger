@@ -65,7 +65,7 @@ void create(entt::registry &registry, Physics &physics) {
         player, InputComponent {
             {sf::Keyboard::Key::A, InputAction::WALK_LEFT},
             {sf::Keyboard::Key::D, InputAction::WALK_RIGHT},
-            {JustPressedKey { sf::Keyboard::Key::Space }, InputAction::JUMP}
+            {JustPressed(sf::Keyboard::Space), InputAction::JUMP}
         });
 
     // The players arm
@@ -85,6 +85,9 @@ void create(entt::registry &registry, Physics &physics) {
 
     // Add arm inputs
     registry.emplace<entt::tag<"rotate_to_mouse"_hs>>(arm);
+    registry.emplace<InputComponent>(arm, InputComponent {
+        {JustPressed(sf::Mouse::Left), InputAction::FIRE_ROPE}
+    });
 
     // Sort drawable entities by z index
     registry.sort<Drawable>([](const auto &lhs, const auto &rhs) {

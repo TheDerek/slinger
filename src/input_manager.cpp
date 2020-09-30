@@ -24,12 +24,10 @@ UIAction InputManager::handleInput(entt::registry &registry, sf::Window &window)
             return UIAction::CLOSE_GAME;
         }
 
-        // Any any one time key presses to the just key pressed list
         if (event.type == sf::Event::KeyPressed) {
             firstTimeKeyPresses_.insert(event.key.code);
         }
 
-        // Any any one time key presses to the just key pressed list
         if (event.type == sf::Event::MouseButtonPressed) {
             firstTimeButtonPresses_.insert(event.mouseButton.button);
         }
@@ -66,9 +64,14 @@ bool InputManager::operator() (sf::Mouse::Button button) const {
     return sf::Mouse::isButtonPressed(button);
 }
 
-bool InputManager::operator() (JustPressedKey key) const {
+bool InputManager::operator() (JustPressed<sf::Keyboard::Key> key) const {
     return firstTimeKeyPresses_.contains(key.value);
 }
+
+bool InputManager::operator() (JustPressed<sf::Mouse::Button> button) const {
+    return firstTimeButtonPresses_.contains(button.value);
+}
+
 
 void InputManager::handleMovement(InputAction action, Movement& movement) {
     if (action == InputAction::WALK_RIGHT) {
@@ -82,8 +85,4 @@ void InputManager::handleMovement(InputAction action, Movement& movement) {
     if (action == InputAction::JUMP) {
         movement.jumping = true;
     }
-}
-
-bool operator==(const JustPressedKey &lhs, const JustPressedKey &rhs) {
-    return lhs.value == rhs.value;
 }
