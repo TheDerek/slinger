@@ -104,7 +104,7 @@ int main() {
     entt::registry registry;
     Physics physics(registry);
     Illustrator illustrator(window);
-    InputManager inputManager(window);
+    InputManager inputManager(window, physics.getDispatcher());
 
     create(registry, physics);
 

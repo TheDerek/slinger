@@ -19,4 +19,12 @@ struct Movement {
     }
 };
 
+struct FireRopeEvent {
+    entt::entity entity;
+};
+
+struct JumpEvent {
+    entt::entity entity;
+};
+
 #endif //SLINGER_MISC_COMPONENTS_H

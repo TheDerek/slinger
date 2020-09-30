@@ -8,6 +8,7 @@
 #include <SFML/Window.hpp>
 #include <unordered_map>
 #include <entt/entity/registry.hpp>
+#include <entt/signal/dispatcher.hpp>
 #include <set>
 #include <variant>
 #include "misc_components.h"
@@ -54,9 +55,9 @@ using InputComponent = std::unordered_map<InputButton, InputAction>;
 
 class InputManager {
 public:
-    InputManager(sf::Window& window);
+    InputManager(sf::Window &window, entt::dispatcher& dispatcher);
     UIAction handleInput(entt::registry&, sf::Window&);
-    void handleMovement(InputAction action, Movement& movement);
+    void handleMovement(entt::entity entity, InputAction action, Movement &movement);
 
     bool operator() (sf::Keyboard::Key) const;
     bool operator() (sf::Mouse::Button) const;
@@ -65,6 +66,7 @@ public:
 
 private:
     sf::Window& window_;
+    entt::dispatcher& dispatcher_;
     std::set<sf::Keyboard::Key> firstTimeKeyPresses_;
     std::set<sf::Mouse::Button> firstTimeButtonPresses_;
 

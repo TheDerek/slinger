@@ -52,9 +52,12 @@ class Physics
 private:
     b2World world_;
     entt::registry& registry_;
-    static const float TIME_STEP;
+    entt::dispatcher dispatcher_;
+public:
+    [[nodiscard]] entt::dispatcher& getDispatcher();
 
 public:
+    static const float TIME_STEP;
     static constexpr float PI=3.14159265358979f;
     static b2Vec2 tob2(const sf::Vector2f& vec);
     static float toRadians(float deg);
@@ -70,12 +73,13 @@ public:
     FixtureInfoPtr makeFixture(sf::Shape* shape,  entt::registry& reg, entt::entity body);
     FixtureInfoPtr& makeFixture(entt::entity, sf::Shape*,  entt::registry&, entt::entity body);
 
-    void createJoint(const b2JointDef&);
-
 private:
     void manageMovement(entt::entity entity, b2Body &body, Movement &movement);
-
     void rotateToMouse(b2Body &body, const sf::Vector2f &mousePos);
+    void fireRope(FireRopeEvent event);
+    void jump(JumpEvent event);
+    bool isOnFloor(entt::entity entity);
+
 };
 
 

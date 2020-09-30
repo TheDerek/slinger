@@ -6,7 +6,8 @@
 #include "input_manager.h"
 #include "misc_components.h"
 
-InputManager::InputManager(sf::Window &window) : window_(window) {
+InputManager::InputManager(sf::Window &window, entt::dispatcher& dispatcher) :
+    window_(window), dispatcher_(dispatcher) {
 
 }
 
@@ -44,11 +45,11 @@ UIAction InputManager::handleInput(entt::registry &registry, sf::Window &window)
             InputAction action = kv.second;
 
             if (Movement* movement = registry.try_get<Movement>(entity)) {
-                handleMovement(action, *movement);
+                handleMovement(entity, action, *movement);
             }
 
             if (action == InputAction::FIRE_ROPE) {
-                std::cout << "Firing a rope!" << std::endl;
+                dispatcher_.enqueue(FireRopeEvent { entity });
             }
         }
     }
@@ -73,7 +74,7 @@ bool InputManager::operator() (JustPressed<sf::Mouse::Button> button) const {
 }
 
 
-void InputManager::handleMovement(InputAction action, Movement& movement) {
+void InputManager::handleMovement(entt::entity entity, InputAction action, Movement &movement) {
     if (action == InputAction::WALK_RIGHT) {
         movement.direction += 1;
     }
@@ -83,6 +84,6 @@ void InputManager::handleMovement(InputAction action, Movement& movement) {
     }
 
     if (action == InputAction::JUMP) {
-        movement.jumping = true;
+        dispatcher_.enqueue(JumpEvent { entity });
     }
 }
