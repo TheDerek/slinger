@@ -6,19 +6,20 @@
 #include "input_manager.h"
 #include "misc_components.h"
 
-InputManager::InputManager(sf::Window &window, entt::dispatcher& dispatcher) :
-    window_(window), dispatcher_(dispatcher) {
+InputManager::InputManager(sf::Window &window, entt::dispatcher& dispatcher, entt::registry& registry) :
+    window_(window), dispatcher_(dispatcher), registry_(registry) {
 
+    registry_.on_construct<InputComponent>().connect<&InputManager::onAddInputComponent>(this);
 }
 
-UIAction InputManager::handleInput(entt::registry &registry, sf::Window &window) {
+UIAction InputManager::handleInput() {
     // Remove all key releases from the previous frame
     firstTimeKeyPresses_.clear();
     firstTimeButtonPresses_.clear();
 
     // Process events
     sf::Event event;
-    while (window.pollEvent(event)) {
+    while (window_.pollEvent(event)) {
         // Close window: exit
         if (event.type == sf::Event::Closed ||
             (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape)) {
@@ -35,21 +36,27 @@ UIAction InputManager::handleInput(entt::registry &registry, sf::Window &window)
     }
 
     // Handle walking
-    auto view = registry.view<InputComponent>();
+    auto view = registry_.view<InputComponent>();
     for (auto entity : view) {
-        for (const auto &kv : registry.get<InputComponent>(entity)) {
+        for (const auto &kv : registry_.get<InputComponent>(entity)) {
             if(!std::visit(*this, kv.first)) {
                 continue;
             }
 
-            InputAction action = kv.second;
-
-            if (Movement* movement = registry.try_get<Movement>(entity)) {
-                handleMovement(entity, action, *movement);
+            if(auto* action = std::get_if<InputAction>(&kv.second)) {
+                if (Movement* movement = registry_.try_get<Movement>(entity)) {
+                    handleMovement(entity, *action, *movement);
+                }
             }
 
-            if (action == InputAction::FIRE_ROPE) {
-                dispatcher_.enqueue(FireRopeEvent { entity });
+            // TODO: Find a way to automate this during compile time
+
+            if(auto* jump = std::get_if<Jump>(&kv.second)) {
+                dispatcher_.enqueue(Event(entity, *jump));
+            }
+
+            if(auto* fireRope = std::get_if<FireRope>(&kv.second)) {
+                dispatcher_.enqueue(Event(entity, *fireRope));
             }
         }
     }
@@ -82,8 +89,15 @@ void InputManager::handleMovement(entt::entity entity, InputAction action, Movem
     if (action == InputAction::WALK_LEFT) {
         movement.direction -= 1;
     }
+}
 
-    if (action == InputAction::JUMP) {
-        dispatcher_.enqueue(JumpEvent { entity });
-    }
+void InputManager::onAddInputComponent(entt::registry& registry, entt::entity entity) {
+    std::cout << "wohoo adding input component" << std::endl;
+
+    auto& inputComponent = registry.get<InputComponent>(entity);
+
+}
+
+void InputManager::operator()(InputAction action) const {
+
 }

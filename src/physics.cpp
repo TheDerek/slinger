@@ -19,9 +19,8 @@ Physics::Physics(entt::registry &registry) :
 {
     world_.SetContactListener(new ContactListener());
 
-    dispatcher_.sink<FireRopeEvent>().connect<&Physics::fireRope>(*this);
-    dispatcher_.sink<JumpEvent>().connect<&Physics::jump>(*this);
-
+    dispatcher_.sink<Event<FireRope>>().connect<&Physics::fireRope>(*this);
+    dispatcher_.sink<Event<Jump>>().connect<&Physics::jump>(*this);
 }
 
 const float Physics::TIME_STEP = 1 / 60.f;
@@ -195,7 +194,7 @@ void Physics::rotateToMouse(b2Body &body, const sf::Vector2f &mousePos) {
     body.SetTransform(body.GetPosition(), desiredAngle);
 }
 
-void Physics::fireRope(FireRopeEvent event) {
+void Physics::fireRope(Event<FireRope> event) {
     std::cout << "Firing a rope from physics!" << std::endl;
 }
 
@@ -203,7 +202,7 @@ entt::dispatcher & Physics::getDispatcher() {
     return dispatcher_;
 }
 
-void Physics::jump(JumpEvent event) {
+void Physics::jump(Event<Jump> event) {
     if (!isOnFloor(event.entity)) {
         return;
     }
@@ -211,7 +210,7 @@ void Physics::jump(JumpEvent event) {
     BodyPtr& body = registry_.get<BodyPtr>(event.entity);
 
     std::cout << "Gonna jump!" << std::endl;
-    float impulse = body->GetMass() * 80;
+    float impulse = body->GetMass() * event.eventDef.impulse;
     body->ApplyLinearImpulseToCenter(b2Vec2(0, impulse), false);
 }
 

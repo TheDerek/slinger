@@ -76,8 +76,8 @@ public:
 private:
     void manageMovement(entt::entity entity, b2Body &body, Movement &movement);
     void rotateToMouse(b2Body &body, const sf::Vector2f &mousePos);
-    void fireRope(FireRopeEvent event);
-    void jump(JumpEvent event);
+    void fireRope(Event<FireRope> event);
+    void jump(Event<Jump> event);
     bool isOnFloor(entt::entity entity);
 
 };

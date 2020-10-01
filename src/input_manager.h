@@ -51,25 +51,28 @@ bool operator==(const JustPressed<T> &lhs, const JustPressed<T> &rhs) {
 
 
 using InputButton = std::variant<sf::Keyboard::Key, JustPressed<sf::Keyboard::Key>, JustPressed<sf::Mouse::Button>>;
-using InputComponent = std::unordered_map<InputButton, InputAction>;
+using InputComponent = std::unordered_map<InputButton, std::variant<InputAction, FireRope, Jump>>;
 
 class InputManager {
 public:
-    InputManager(sf::Window &window, entt::dispatcher& dispatcher);
-    UIAction handleInput(entt::registry&, sf::Window&);
+    InputManager(sf::Window&, entt::dispatcher&, entt::registry&);
+    UIAction handleInput();
     void handleMovement(entt::entity entity, InputAction action, Movement &movement);
 
     bool operator() (sf::Keyboard::Key) const;
     bool operator() (sf::Mouse::Button) const;
     bool operator() (JustPressed<sf::Keyboard::Key>) const;
     bool operator() (JustPressed<sf::Mouse::Button>) const;
+    void operator() (InputAction action) const;
 
 private:
     sf::Window& window_;
+    entt::registry& registry_;
     entt::dispatcher& dispatcher_;
     std::set<sf::Keyboard::Key> firstTimeKeyPresses_;
     std::set<sf::Mouse::Button> firstTimeButtonPresses_;
 
+    void onAddInputComponent(entt::registry& registry, entt::entity);
 };
 
 

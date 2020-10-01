@@ -19,12 +19,21 @@ struct Movement {
     }
 };
 
-struct FireRopeEvent {
+
+template <class T>
+struct Event {
     entt::entity entity;
+    T eventDef;
+
+    Event(entt::entity entity, T eventDef): entity(entity), eventDef(eventDef) {};
 };
 
-struct JumpEvent {
-    entt::entity entity;
+struct FireRope {
+    sf::Vector2f localPos;
+};
+
+struct Jump {
+    float impulse = 80;
 };
 
 #endif //SLINGER_MISC_COMPONENTS_H

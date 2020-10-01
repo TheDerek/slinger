@@ -65,7 +65,7 @@ void create(entt::registry &registry, Physics &physics) {
         player, InputComponent {
             {sf::Keyboard::Key::A, InputAction::WALK_LEFT},
             {sf::Keyboard::Key::D, InputAction::WALK_RIGHT},
-            {JustPressed(sf::Keyboard::Space), InputAction::JUMP}
+            {JustPressed(sf::Keyboard::Space), Jump { 80 } }
         });
 
     // The players arm
@@ -86,7 +86,7 @@ void create(entt::registry &registry, Physics &physics) {
     // Add arm inputs
     registry.emplace<entt::tag<"rotate_to_mouse"_hs>>(arm);
     registry.emplace<InputComponent>(arm, InputComponent {
-        {JustPressed(sf::Mouse::Left), InputAction::FIRE_ROPE}
+        {JustPressed(sf::Mouse::Left), FireRope { sf::Vector2f(0, 5) } }
     });
 
     // Sort drawable entities by z index
@@ -104,7 +104,7 @@ int main() {
     entt::registry registry;
     Physics physics(registry);
     Illustrator illustrator(window);
-    InputManager inputManager(window, physics.getDispatcher());
+    InputManager inputManager(window, physics.getDispatcher(), registry);
 
     create(registry, physics);
 
@@ -113,7 +113,7 @@ int main() {
 
     // Start the game loop
     do {
-        action = inputManager.handleInput(registry, window);
+        action = inputManager.handleInput();
 
         // Clear screen
         window.clear(WHITE);

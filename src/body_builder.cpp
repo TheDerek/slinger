@@ -63,6 +63,8 @@ ShapeBuilder &ShapeBuilder::setFootSensor() {
 
 ShapeBuilder &ShapeBuilder::setZIndex(int z) {
     prototype.zIndex = z;
+
+    return *this;
 }
 
 BodyBuilder::BodyBuilder(entt::registry &registry, Physics &physics) :
