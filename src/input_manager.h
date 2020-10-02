@@ -11,6 +11,7 @@
 #include <entt/signal/dispatcher.hpp>
 #include <set>
 #include <variant>
+#include <SFML/Graphics/RenderWindow.hpp>
 #include "misc_components.h"
 
 enum class InputAction {
@@ -55,7 +56,7 @@ using InputComponent = std::unordered_map<InputButton, std::variant<InputAction,
 
 class InputManager {
 public:
-    InputManager(sf::Window&, entt::dispatcher&, entt::registry&);
+    InputManager(sf::RenderWindow&, entt::dispatcher&, entt::registry&);
     UIAction handleInput();
     void handleMovement(entt::entity entity, InputAction action, Movement &movement);
 
@@ -66,7 +67,7 @@ public:
     void operator() (InputAction action) const;
 
 private:
-    sf::Window& window_;
+    sf::RenderWindow& window_;
     entt::registry& registry_;
     entt::dispatcher& dispatcher_;
     std::set<sf::Keyboard::Key> firstTimeKeyPresses_;

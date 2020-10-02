@@ -13,21 +13,18 @@
 #include <SFML/Graphics/Shape.hpp>
 #include "misc_components.h"
 
-struct BodyDeleter
-{
-    void operator()(b2Body* body) const;
+struct BodyDeleter {
+    void operator()(b2Body *body) const;
 };
 
-struct FixtureDeleter
-{
-    void operator()(b2Fixture* fixture) const;
+struct FixtureDeleter {
+    void operator()(b2Fixture *fixture) const;
 };
 
 using BodyPtr = std::unique_ptr<b2Body, BodyDeleter>;
 using FixturePtr = std::unique_ptr<b2Fixture, FixtureDeleter>;
 
-struct FixtureInfo
-{
+struct FixtureInfo {
     FixturePtr value;
     float angleOffset;
     sf::Vector2f posOffset;
@@ -41,46 +38,60 @@ struct FootSensor {
 };
 
 
-class ContactListener : public b2ContactListener
-{
-    void BeginContact(b2Contact* contact) override;
-    void EndContact(b2Contact* contact) override;
+class ContactListener : public b2ContactListener {
+    void BeginContact(b2Contact *contact) override;
+
+    void EndContact(b2Contact *contact) override;
 };
 
-class Physics
-{
+class Physics : b2RayCastCallback {
 private:
     b2World world_;
-    entt::registry& registry_;
-    entt::dispatcher dispatcher_;
-public:
-    [[nodiscard]] entt::dispatcher& getDispatcher();
+    entt::registry &registry_;
+    entt::dispatcher &dispatcher_;
+    entt::entity rayCastEntity_;
 
 public:
+    explicit Physics(entt::registry &, entt::dispatcher &);
+
     static const float TIME_STEP;
-    static constexpr float PI=3.14159265358979f;
-    static b2Vec2 tob2(const sf::Vector2f& vec);
-    static float toRadians(float deg);
-    static float toDegrees(float rad);
-    b2World &getWorld();
+    static constexpr float PI = 3.14159265358979f;
 
-    explicit Physics(entt::registry&);
+    static b2Vec2 tob2(const sf::Vector2f &vec);
+
+    static float toRadians(float deg);
+
+    static float toDegrees(float rad);
+
+    b2World &getWorld();
 
     void handlePhysics(entt::registry &registry, float delta, const sf::Vector2f &mousePos);
 
     BodyPtr makeBody(sf::Vector2f pos, float rot = 0, b2BodyType = b2_dynamicBody);
-    BodyPtr & makeBody(entt::entity entity, sf::Vector2f pos, float rot = 0, b2BodyType = b2_dynamicBody);
-    FixtureInfoPtr makeFixture(sf::Shape* shape,  entt::registry& reg, entt::entity body);
-    FixtureInfoPtr& makeFixture(entt::entity, sf::Shape*,  entt::registry&, entt::entity body);
+
+    BodyPtr &makeBody(entt::entity entity, sf::Vector2f pos, float rot = 0, b2BodyType = b2_dynamicBody);
+
+    FixtureInfoPtr makeFixture(sf::Shape *shape, entt::registry &reg, entt::entity body);
+
+    FixtureInfoPtr &makeFixture(entt::entity, sf::Shape *, entt::registry &, entt::entity body);
 
 private:
     void manageMovement(entt::entity entity, b2Body &body, Movement &movement);
+
     void rotateToMouse(b2Body &body, const sf::Vector2f &mousePos);
+
     void fireRope(Event<FireRope> event);
+
     void jump(Event<Jump> event);
+
     bool isOnFloor(entt::entity entity);
 
+    float ReportFixture(
+        b2Fixture *fixture,
+        const b2Vec2 &point,
+        const b2Vec2 &normal,
+        float fraction
+    ) override;
 };
-
 
 #endif //SLINGER_PHYSICS_H

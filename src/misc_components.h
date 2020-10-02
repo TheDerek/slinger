@@ -30,6 +30,7 @@ struct Event {
 
 struct FireRope {
     sf::Vector2f localPos;
+    sf::Vector2f target;
 };
 
 struct Jump {

@@ -13,8 +13,8 @@
 #include "misc_components.h"
 
 
-Physics::Physics(entt::registry &registry) :
-    registry_(registry),
+Physics::Physics(entt::registry &registry, entt::dispatcher& dispatcher) :
+    registry_(registry), dispatcher_(dispatcher),
     world_(b2Vec2(0, -200.f))
 {
     world_.SetContactListener(new ContactListener());
@@ -196,10 +196,14 @@ void Physics::rotateToMouse(b2Body &body, const sf::Vector2f &mousePos) {
 
 void Physics::fireRope(Event<FireRope> event) {
     std::cout << "Firing a rope from physics!" << std::endl;
-}
 
-entt::dispatcher & Physics::getDispatcher() {
-    return dispatcher_;
+    rayCastEntity_ = event.entity;
+    const auto& body = registry_.get<BodyPtr>(event.entity);
+    auto startingPos = body->GetWorldPoint(tob2(event.eventDef.localPos));
+    auto endingPos = tob2(event.eventDef.target);
+    std::cout << endingPos.x << ", " << endingPos.y << std::endl;
+
+    world_.RayCast(this, startingPos, endingPos);
 }
 
 void Physics::jump(Event<Jump> event) {
@@ -222,6 +226,22 @@ bool Physics::isOnFloor(entt::entity entity) {
     }
 
     return foot->fixture->numberOfContacts > 0;
+}
+
+float Physics::ReportFixture(b2Fixture *fixture, const b2Vec2 &point, const b2Vec2 &normal, float fraction) {
+    std::cout << "hit something!" << std::endl;
+
+    // TODO Figure out how to get the person who fired the rope here
+    std::cout << "Point=" << point.x << ", " << point.y << std::endl;
+
+    b2RopeJointDef jointDef;
+    jointDef.bodyA = fixture->GetBody();
+    jointDef.localAnchorA = fixture->GetBody()->GetLocalPoint(point);
+    jointDef.bodyB = registry_.get<BodyPtr>(rayCastEntity_).get();
+    jointDef.maxLength = (point - jointDef.bodyB->GetPosition()).Length();
+
+    world_.CreateJoint(&jointDef);
+    return 0;
 }
 
 void BodyDeleter::operator()(b2Body *body) const {

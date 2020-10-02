@@ -102,9 +102,10 @@ int main() {
     window.setKeyRepeatEnabled(false);
 
     entt::registry registry;
-    Physics physics(registry);
-    Illustrator illustrator(window);
-    InputManager inputManager(window, physics.getDispatcher(), registry);
+    entt::dispatcher dispatcher;
+    Physics physics(registry, dispatcher);
+    Illustrator illustrator(window, registry, dispatcher);
+    InputManager inputManager(window, dispatcher, registry);
 
     create(registry, physics);
 

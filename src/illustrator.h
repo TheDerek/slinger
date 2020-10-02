@@ -7,6 +7,8 @@
 
 #include <SFML/Graphics.hpp>
 #include <entt/entity/registry.hpp>
+#include <entt/signal/dispatcher.hpp>
+#include "misc_components.h"
 
 //TODO: Replace with container struct that has the
 // shape and the Z index which we will use to sort
@@ -27,20 +29,23 @@ class Illustrator
 {
     sf::View camera_;
     sf::RenderWindow& window_;
+    entt::dispatcher& dispatcher_;
+    entt::registry& registry_;
 
 public:
-    explicit Illustrator(sf::RenderWindow& window);
+    explicit Illustrator(sf::RenderWindow &window, entt::registry &registry, entt::dispatcher &dispatcher);
 
     void draw(entt::registry &registry);
 
     Drawable makeRectangle(const sf::Vector2f& size, const sf::Vector2f& pos) const;
     Drawable makeCircle(float radius, const sf::Vector2f& pos) const;
 
-    std::vector<sf::Vector2f> getRandomViewPoints(int count);
 
 private:
     float round(float number, float multiple);
     sf::Vector2f absolute(const sf::Vector2f& vec);
+    void addRope(const Event<FireRope>& event);
+
 };
 
 inline bool operator> (const sf::Vector2f& lhs, const sf::Vector2f& rhs);

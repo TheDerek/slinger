@@ -6,7 +6,7 @@
 #include "input_manager.h"
 #include "misc_components.h"
 
-InputManager::InputManager(sf::Window &window, entt::dispatcher& dispatcher, entt::registry& registry) :
+InputManager::InputManager(sf::RenderWindow &window, entt::dispatcher& dispatcher, entt::registry& registry) :
     window_(window), dispatcher_(dispatcher), registry_(registry) {
 
     registry_.on_construct<InputComponent>().connect<&InputManager::onAddInputComponent>(this);
@@ -56,7 +56,9 @@ UIAction InputManager::handleInput() {
             }
 
             if(auto* fireRope = std::get_if<FireRope>(&kv.second)) {
-                dispatcher_.enqueue(Event(entity, *fireRope));
+                auto event = Event(entity, *fireRope);
+                event.eventDef.target = window_.mapPixelToCoords(sf::Mouse::getPosition(window_));
+                dispatcher_.enqueue(event);
             }
         }
     }
