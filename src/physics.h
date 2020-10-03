@@ -21,8 +21,13 @@ struct FixtureDeleter {
     void operator()(b2Fixture *fixture) const;
 };
 
+struct JointDeleter {
+    void operator()(b2Joint *joint) const;
+};
+
 using BodyPtr = std::unique_ptr<b2Body, BodyDeleter>;
 using FixturePtr = std::unique_ptr<b2Fixture, FixtureDeleter>;
+using JointPtr = std::unique_ptr<b2Joint, JointDeleter>;
 
 struct FixtureInfo {
     FixturePtr value;

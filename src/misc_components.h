@@ -5,6 +5,7 @@
 #ifndef SLINGER_MISC_COMPONENTS_H
 #define SLINGER_MISC_COMPONENTS_H
 
+
 struct Movement {
     float speed = 60;
     float acceleration = 20;
@@ -17,6 +18,10 @@ struct Movement {
     [[nodiscard]] float vel() const {
         return direction * speed;
     }
+};
+
+struct Rope {
+
 };
 
 

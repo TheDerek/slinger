@@ -13,10 +13,9 @@
 #include "misc_components.h"
 
 
-Physics::Physics(entt::registry &registry, entt::dispatcher& dispatcher) :
+Physics::Physics(entt::registry &registry, entt::dispatcher &dispatcher) :
     registry_(registry), dispatcher_(dispatcher),
-    world_(b2Vec2(0, -200.f))
-{
+    world_(b2Vec2(0, -200.f)) {
     world_.SetContactListener(new ContactListener());
 
     dispatcher_.sink<Event<FireRope>>().connect<&Physics::fireRope>(*this);
@@ -48,12 +47,37 @@ void Physics::handlePhysics(entt::registry &registry, float delta, const sf::Vec
     registry.view<BodyPtr>().each(
         [delta, mousePos, &registry, this](const auto entity, const BodyPtr &body) {
             if (Movement *movement = registry.try_get<Movement>(entity)) {
+
+
                 this->manageMovement(entity, *body, *movement);
             }
 
             if (registry.has<entt::tag<"rotate_to_mouse"_hs>>(entity)) {
                 this->rotateToMouse(*body, mousePos);
             }
+        }
+    );
+
+    registry.view<JointPtr, Drawable>().each(
+        [](const auto entity, const JointPtr &joint, Drawable &drawable) {
+            const auto pointA = joint->GetAnchorA();
+            const auto pointB = joint->GetAnchorB();
+            const auto distance = pointB - pointA;
+
+            const auto angle = atan2f(distance.y, distance.x);
+            const auto length = distance.Length();
+
+            // TODO: Make rope thinner the closer it is to max length
+
+            drawable.value->setPosition(
+                pointA.x,
+                pointA.y
+            );
+
+            drawable.value->setRotation(angle * 180.f / 3.145f);
+
+            auto* rect = dynamic_cast<sf::RectangleShape*>(drawable.value.get());
+            rect->setSize(sf::Vector2f(length, rect->getSize().y));
         }
     );
 
@@ -198,7 +222,7 @@ void Physics::fireRope(Event<FireRope> event) {
     std::cout << "Firing a rope from physics!" << std::endl;
 
     rayCastEntity_ = event.entity;
-    const auto& body = registry_.get<BodyPtr>(event.entity);
+    const auto &body = registry_.get<BodyPtr>(event.entity);
     auto startingPos = body->GetWorldPoint(tob2(event.eventDef.localPos));
     auto endingPos = tob2(event.eventDef.target);
     std::cout << endingPos.x << ", " << endingPos.y << std::endl;
@@ -211,7 +235,7 @@ void Physics::jump(Event<Jump> event) {
         return;
     }
 
-    BodyPtr& body = registry_.get<BodyPtr>(event.entity);
+    BodyPtr &body = registry_.get<BodyPtr>(event.entity);
 
     std::cout << "Gonna jump!" << std::endl;
     float impulse = body->GetMass() * event.eventDef.impulse;
@@ -229,18 +253,36 @@ bool Physics::isOnFloor(entt::entity entity) {
 }
 
 float Physics::ReportFixture(b2Fixture *fixture, const b2Vec2 &point, const b2Vec2 &normal, float fraction) {
-    std::cout << "hit something!" << std::endl;
-
-    // TODO Figure out how to get the person who fired the rope here
-    std::cout << "Point=" << point.x << ", " << point.y << std::endl;
-
     b2RopeJointDef jointDef;
     jointDef.bodyA = fixture->GetBody();
     jointDef.localAnchorA = fixture->GetBody()->GetLocalPoint(point);
-    jointDef.bodyB = registry_.get<BodyPtr>(rayCastEntity_).get();
-    jointDef.maxLength = (point - jointDef.bodyB->GetPosition()).Length();
 
-    world_.CreateJoint(&jointDef);
+    // TODO Figure out how to get the person who fired the rope here
+    jointDef.bodyB = registry_.get<BodyPtr>(rayCastEntity_).get();
+    // TODO Figure out how to get the arm position here from the event
+    jointDef.localAnchorB = b2Vec2(0, 7);
+
+    jointDef.maxLength = (point - jointDef.bodyB->GetWorldPoint(jointDef.localAnchorB)).Length();
+
+    auto rope = registry_.create();
+
+    auto joint = JointPtr(world_.CreateJoint(&jointDef));
+    registry_.emplace<JointPtr>(rope, std::move(joint));
+
+    auto width = 1.f;
+
+    auto drawable = Drawable{
+        std::make_unique<sf::RectangleShape>(sf::Vector2f(16, width)),
+        3
+    };
+    drawable.value->setOrigin(0, width/2);
+    registry_.emplace<Drawable>(rope, std::move(drawable));
+
+    // Sort drawable entities by z index
+    registry_.sort<Drawable>([](const auto &lhs, const auto &rhs) {
+        return lhs.zIndex < rhs.zIndex;
+    });
+
     return 0;
 }
 
@@ -266,4 +308,8 @@ void ContactListener::EndContact(b2Contact *contact) {
 
     fixA->numberOfContacts -= 1;
     fixB->numberOfContacts -= 1;
+}
+
+void JointDeleter::operator()(b2Joint *joint) const {
+    joint->GetBodyA()->GetWorld()->DestroyJoint(joint);
 }
