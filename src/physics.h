@@ -33,6 +33,7 @@ struct FixtureInfo {
     FixturePtr value;
     float angleOffset;
     sf::Vector2f posOffset;
+    entt::entity entity;
     int numberOfContacts = 0;
 };
 
@@ -76,9 +77,7 @@ public:
 
     BodyPtr &makeBody(entt::entity entity, sf::Vector2f pos, float rot = 0, b2BodyType = b2_dynamicBody);
 
-    FixtureInfoPtr makeFixture(sf::Shape *shape, entt::registry &reg, entt::entity body);
-
-    FixtureInfoPtr &makeFixture(entt::entity, sf::Shape *, entt::registry &, entt::entity body);
+    FixtureInfoPtr& makeFixture(entt::entity, sf::Shape*, entt::registry&, entt::entity body);
 
 private:
     void manageMovement(entt::entity entity, b2Body &body, Movement &movement);

@@ -94,8 +94,13 @@ BodyPtr Physics::makeBody(sf::Vector2f pos, float rot, b2BodyType bodyType) {
     return BodyPtr(world_.CreateBody(&bodyDef));
 }
 
-FixtureInfoPtr Physics::makeFixture(sf::Shape *shape, entt::registry &reg, entt::entity bodyEntity) {
-
+FixtureInfoPtr& Physics::makeFixture(
+    entt::entity entity,
+    sf::Shape *shape,
+    entt::registry &reg,
+    entt::entity bodyEntity
+)
+{
     const BodyPtr *body = reg.try_get<BodyPtr>(bodyEntity);
     assert(body);
 
@@ -139,21 +144,19 @@ FixtureInfoPtr Physics::makeFixture(sf::Shape *shape, entt::registry &reg, entt:
     fixtureDef.density = 1.0f;
     fixtureDef.friction = 0.0f;
 
-    auto fix = FixtureInfoPtr(
-        new FixtureInfo{
+    auto fix = std::make_shared<FixtureInfo>(
+        FixtureInfo {
             FixturePtr((*body)->CreateFixture(&fixtureDef)),
             shape->getRotation(),
-            shape->getPosition()
+            shape->getPosition(),
+            entity
         }
     );
 
     fix->value->SetUserData(static_cast<void *>(fix.get()));
-    return fix;
+    return registry_.emplace<FixtureInfoPtr>(entity, fix);
 }
 
-FixtureInfoPtr &Physics::makeFixture(entt::entity entity, sf::Shape *shape, entt::registry &reg, entt::entity body) {
-    return registry_.emplace<FixtureInfoPtr>(entity, makeFixture(shape, registry_, body));
-}
 
 b2Vec2 Physics::tob2(const sf::Vector2f &vec) {
     return b2Vec2(vec.x, vec.y);
@@ -230,29 +233,11 @@ void Physics::fireRope(Event<FireRope> event) {
     world_.RayCast(this, startingPos, endingPos);
 }
 
-void Physics::jump(Event<Jump> event) {
-    if (!isOnFloor(event.entity)) {
-        return;
-    }
-
-    BodyPtr &body = registry_.get<BodyPtr>(event.entity);
-
-    std::cout << "Gonna jump!" << std::endl;
-    float impulse = body->GetMass() * event.eventDef.impulse;
-    body->ApplyLinearImpulseToCenter(b2Vec2(0, impulse), false);
-}
-
-bool Physics::isOnFloor(entt::entity entity) {
-    const auto *foot = registry_.try_get<FootSensor>(entity);
-
-    if (!foot) {
-        return true;
-    }
-
-    return foot->fixture->numberOfContacts > 0;
-}
-
+// Called when the rope hits something
 float Physics::ReportFixture(b2Fixture *fixture, const b2Vec2 &point, const b2Vec2 &normal, float fraction) {
+    // Find the entity that fired the rope
+    auto* fixInfo = static_cast<FixtureInfo *>(fixture->GetUserData());
+
     b2RopeJointDef jointDef;
     jointDef.bodyA = fixture->GetBody();
     jointDef.localAnchorA = fixture->GetBody()->GetLocalPoint(point);
@@ -284,6 +269,28 @@ float Physics::ReportFixture(b2Fixture *fixture, const b2Vec2 &point, const b2Ve
     });
 
     return 0;
+}
+
+void Physics::jump(Event<Jump> event) {
+    if (!isOnFloor(event.entity)) {
+        return;
+    }
+
+    BodyPtr &body = registry_.get<BodyPtr>(event.entity);
+
+    std::cout << "Gonna jump!" << std::endl;
+    float impulse = body->GetMass() * event.eventDef.impulse;
+    body->ApplyLinearImpulseToCenter(b2Vec2(0, impulse), false);
+}
+
+bool Physics::isOnFloor(entt::entity entity) {
+    const auto *foot = registry_.try_get<FootSensor>(entity);
+
+    if (!foot) {
+        return true;
+    }
+
+    return foot->fixture->numberOfContacts > 0;
 }
 
 void BodyDeleter::operator()(b2Body *body) const {
