@@ -97,7 +97,6 @@ void InputManager::onAddInputComponent(entt::registry& registry, entt::entity en
     std::cout << "wohoo adding input component" << std::endl;
 
     auto& inputComponent = registry.get<InputComponent>(entity);
-
 }
 
 void InputManager::operator()(InputAction action) const {

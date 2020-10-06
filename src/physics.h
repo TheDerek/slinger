@@ -46,16 +46,32 @@ struct FootSensor {
 
 class ContactListener : public b2ContactListener {
     void BeginContact(b2Contact *contact) override;
-
     void EndContact(b2Contact *contact) override;
 };
 
-class Physics : b2RayCastCallback {
+class RopeHitCallback : public b2RayCastCallback {
+    entt::registry& registry_;
+    b2World& world_;
+    entt::entity entity_;
+    sf::Vector2f localFireLoc_;
+
+    float ReportFixture(
+        b2Fixture *fixture,
+        const b2Vec2 &point,
+        const b2Vec2 &normal,
+        float fraction
+    ) override;
+
+public:
+    RopeHitCallback(entt::registry &registry, entt::entity entity, b2World &world,
+        sf::Vector2f localFireLoc);
+};
+
+class Physics {
 private:
     b2World world_;
     entt::registry &registry_;
     entt::dispatcher &dispatcher_;
-    entt::entity rayCastEntity_;
 
 public:
     explicit Physics(entt::registry &, entt::dispatcher &);
@@ -82,20 +98,13 @@ public:
 private:
     void manageMovement(entt::entity entity, b2Body &body, Movement &movement);
 
-    void rotateToMouse(b2Body &body, const sf::Vector2f &mousePos);
+    void rotateToPoint(b2Body &body, const sf::Vector2f &mousePos);
 
     void fireRope(Event<FireRope> event);
 
     void jump(Event<Jump> event);
 
     bool isOnFloor(entt::entity entity);
-
-    float ReportFixture(
-        b2Fixture *fixture,
-        const b2Vec2 &point,
-        const b2Vec2 &normal,
-        float fraction
-    ) override;
 };
 
 #endif //SLINGER_PHYSICS_H

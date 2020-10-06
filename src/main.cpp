@@ -47,6 +47,7 @@ void create(entt::registry &registry, Physics &physics) {
             .setColor(sf::Color(100, 200, 50))
             .makeFixture()
             .draw()
+            .setZIndex(0)
             .create()
         .addRect(8, 1)
             .setPos(0, -10)
@@ -77,7 +78,7 @@ void create(entt::registry &registry, Physics &physics) {
             .draw()
             .setZIndex(1)
             .setDensity(0)
-            .setPos(0, 3.5f)
+            .setPos(0, 4.f)
             .create()
         .attach(player, 0, 7, 0, 0)
         .setFixedRotation(true)
@@ -86,12 +87,12 @@ void create(entt::registry &registry, Physics &physics) {
     // Add arm inputs
     registry.emplace<entt::tag<"rotate_to_mouse"_hs>>(arm);
     registry.emplace<InputComponent>(arm, InputComponent {
-        {JustPressed(sf::Mouse::Left), FireRope { sf::Vector2f(0, 5) } }
-    });
-
-    // Sort drawable entities by z index
-    registry.sort<Drawable>([](const auto &lhs, const auto &rhs) {
-        return lhs.zIndex < rhs.zIndex;
+        {
+            JustPressed(sf::Mouse::Left), FireRope {
+                sf::Vector2f(0, 5),
+                sf::Vector2f(0, 7)
+            }
+        }
     });
 }
 

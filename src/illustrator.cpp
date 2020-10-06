@@ -15,7 +15,22 @@ Illustrator::Illustrator(sf::RenderWindow &window, entt::registry &registry, ent
 {
     window_.setView(camera_);
     dispatcher_.sink<Event<FireRope>>().connect<&Illustrator::addRope>(*this);
+
+    registry_.on_construct<Drawable>().connect<&Illustrator::onAddDrawable>(this);
+    registry_.on_destroy<Drawable>().connect<&Illustrator::onAddDrawable>(this);
+
+
 }
+
+void Illustrator::onAddDrawable(entt::registry& registry, entt::entity entity) {
+    // Sort drawable entities by z index
+    registry_.sort<Drawable>(
+        [](const auto &lhs, const auto &rhs) {
+            return lhs.zIndex < rhs.zIndex;
+        }
+    );
+}
+
 
 
 void Illustrator::draw(entt::registry &registry) {

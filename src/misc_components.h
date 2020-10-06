@@ -20,8 +20,9 @@ struct Movement {
     }
 };
 
-struct Rope {
-
+struct HoldingRope {
+    sf::Vector2f ropeLoc;
+    entt::entity rope;
 };
 
 
@@ -34,7 +35,14 @@ struct Event {
 };
 
 struct FireRope {
+    // Set by the creator
+    //-------------------
     sf::Vector2f localPos;
+    // The local location on the body to attach the rope to if it hits something
+    sf::Vector2f localFireLoc;
+
+    // Set by the input controller
+    //----------------------------
     sf::Vector2f target;
 };
 

@@ -46,6 +46,7 @@ private:
     sf::Vector2f absolute(const sf::Vector2f& vec);
     void addRope(const Event<FireRope>& event);
 
+    void onAddDrawable(entt::registry &registry, entt::entity entity);
 };
 
 inline bool operator> (const sf::Vector2f& lhs, const sf::Vector2f& rhs);

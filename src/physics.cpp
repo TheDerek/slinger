@@ -47,13 +47,17 @@ void Physics::handlePhysics(entt::registry &registry, float delta, const sf::Vec
     registry.view<BodyPtr>().each(
         [delta, mousePos, &registry, this](const auto entity, const BodyPtr &body) {
             if (Movement *movement = registry.try_get<Movement>(entity)) {
-
-
                 this->manageMovement(entity, *body, *movement);
             }
 
-            if (registry.has<entt::tag<"rotate_to_mouse"_hs>>(entity)) {
-                this->rotateToMouse(*body, mousePos);
+            if (auto* rope = registry.try_get<HoldingRope>(entity)) {
+                body->SetFixedRotation(false);
+                body->SetAngularDamping(0.7f);
+                //this->rotateToPoint(*body, rope->ropeLoc);
+            }
+            else if (registry.has<entt::tag<"rotate_to_mouse"_hs>>(entity)) {
+                body->SetFixedRotation(true);
+                this->rotateToPoint(*body, mousePos);
             }
         }
     );
@@ -76,7 +80,7 @@ void Physics::handlePhysics(entt::registry &registry, float delta, const sf::Vec
 
             drawable.value->setRotation(angle * 180.f / 3.145f);
 
-            auto* rect = dynamic_cast<sf::RectangleShape*>(drawable.value.get());
+            auto *rect = dynamic_cast<sf::RectangleShape *>(drawable.value.get());
             rect->setSize(sf::Vector2f(length, rect->getSize().y));
         }
     );
@@ -94,13 +98,12 @@ BodyPtr Physics::makeBody(sf::Vector2f pos, float rot, b2BodyType bodyType) {
     return BodyPtr(world_.CreateBody(&bodyDef));
 }
 
-FixtureInfoPtr& Physics::makeFixture(
+FixtureInfoPtr &Physics::makeFixture(
     entt::entity entity,
     sf::Shape *shape,
     entt::registry &reg,
     entt::entity bodyEntity
-)
-{
+) {
     const BodyPtr *body = reg.try_get<BodyPtr>(bodyEntity);
     assert(body);
 
@@ -145,7 +148,7 @@ FixtureInfoPtr& Physics::makeFixture(
     fixtureDef.friction = 0.0f;
 
     auto fix = std::make_shared<FixtureInfo>(
-        FixtureInfo {
+        FixtureInfo{
             FixturePtr((*body)->CreateFixture(&fixtureDef)),
             shape->getRotation(),
             shape->getPosition(),
@@ -215,60 +218,28 @@ b2World &Physics::getWorld() {
     return world_;
 }
 
-void Physics::rotateToMouse(b2Body &body, const sf::Vector2f &mousePos) {
+void Physics::rotateToPoint(b2Body &body, const sf::Vector2f &mousePos) {
     b2Vec2 toTarget = tob2(mousePos) - body.GetPosition();
     float desiredAngle = atan2f(-toTarget.x, toTarget.y);
     body.SetTransform(body.GetPosition(), desiredAngle);
 }
 
 void Physics::fireRope(Event<FireRope> event) {
-    std::cout << "Firing a rope from physics!" << std::endl;
+    if (auto* rope = registry_.try_get<HoldingRope>(event.entity)) {
+//        registry_.remove<JointPtr>(rope->rope);
+//        registry_.remove<Drawable>(rope->rope);
+        registry_.destroy(rope->rope);
+        registry_.remove<HoldingRope>(event.entity);
+        return;
+    }
 
-    rayCastEntity_ = event.entity;
     const auto &body = registry_.get<BodyPtr>(event.entity);
     auto startingPos = body->GetWorldPoint(tob2(event.eventDef.localPos));
     auto endingPos = tob2(event.eventDef.target);
-    std::cout << endingPos.x << ", " << endingPos.y << std::endl;
 
-    world_.RayCast(this, startingPos, endingPos);
-}
-
-// Called when the rope hits something
-float Physics::ReportFixture(b2Fixture *fixture, const b2Vec2 &point, const b2Vec2 &normal, float fraction) {
-    // Find the entity that fired the rope
-    auto* fixInfo = static_cast<FixtureInfo *>(fixture->GetUserData());
-
-    b2RopeJointDef jointDef;
-    jointDef.bodyA = fixture->GetBody();
-    jointDef.localAnchorA = fixture->GetBody()->GetLocalPoint(point);
-
-    // TODO Figure out how to get the person who fired the rope here
-    jointDef.bodyB = registry_.get<BodyPtr>(rayCastEntity_).get();
-    // TODO Figure out how to get the arm position here from the event
-    jointDef.localAnchorB = b2Vec2(0, 7);
-
-    jointDef.maxLength = (point - jointDef.bodyB->GetWorldPoint(jointDef.localAnchorB)).Length();
-
-    auto rope = registry_.create();
-
-    auto joint = JointPtr(world_.CreateJoint(&jointDef));
-    registry_.emplace<JointPtr>(rope, std::move(joint));
-
-    auto width = 1.f;
-
-    auto drawable = Drawable{
-        std::make_unique<sf::RectangleShape>(sf::Vector2f(16, width)),
-        3
-    };
-    drawable.value->setOrigin(0, width/2);
-    registry_.emplace<Drawable>(rope, std::move(drawable));
-
-    // Sort drawable entities by z index
-    registry_.sort<Drawable>([](const auto &lhs, const auto &rhs) {
-        return lhs.zIndex < rhs.zIndex;
-    });
-
-    return 0;
+    // TODO Figure out why this doesn't segfault when c goes out of scope
+    RopeHitCallback c(registry_, event.entity, world_, event.eventDef.localFireLoc);
+    world_.RayCast(&c, startingPos, endingPos);
 }
 
 void Physics::jump(Event<Jump> event) {
@@ -319,4 +290,45 @@ void ContactListener::EndContact(b2Contact *contact) {
 
 void JointDeleter::operator()(b2Joint *joint) const {
     joint->GetBodyA()->GetWorld()->DestroyJoint(joint);
+}
+
+RopeHitCallback::RopeHitCallback(entt::registry &registry, entt::entity entity, b2World &world,
+    sf::Vector2f localFireLoc) :
+    registry_(registry), entity_(entity), world_(world), localFireLoc_(localFireLoc) {}
+
+float RopeHitCallback::ReportFixture(
+    b2Fixture *fixture,
+    const b2Vec2 &point,
+    const b2Vec2 &normal,
+    float fraction) {
+
+    b2RopeJointDef jointDef;
+    jointDef.bodyA = fixture->GetBody();
+    jointDef.localAnchorA = fixture->GetBody()->GetLocalPoint(point);
+
+    jointDef.bodyB = registry_.get<BodyPtr>(entity_).get();
+    // TODO Figure out how to get the arm position here from the event
+    jointDef.localAnchorB = Physics::tob2(localFireLoc_);
+
+    jointDef.maxLength = (point - jointDef.bodyB->GetWorldPoint(jointDef.localAnchorB)).Length();
+
+    auto rope = registry_.create();
+
+    auto joint = JointPtr(world_.CreateJoint(&jointDef));
+    registry_.emplace<JointPtr>(rope, std::move(joint));
+
+    auto width = 1.f;
+
+    auto drawable = Drawable{
+        std::make_unique<sf::RectangleShape>(sf::Vector2f(16, width)),
+        3
+    };
+    drawable.value->setOrigin(0, width / 2.f);
+    registry_.emplace<Drawable>(rope, std::move(drawable));
+
+
+
+    registry_.emplace<HoldingRope>(entity_, HoldingRope { sf::Vector2f(point.x, point.y), rope });
+
+    return 0;
 }
