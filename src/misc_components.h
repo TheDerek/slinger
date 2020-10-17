@@ -8,12 +8,9 @@
 #include <set>
 
 struct Movement {
-    float speed = 6;
-    float acceleration = 2;
-    float deceleration = 0.09f;
-    float jumpVel = 8;
-
-    bool jumping = false;
+    float speed = 10;
+    float acceleration = 3;
+    float deceleration = 0.8f;
     float direction = 0;
 
     [[nodiscard]] float vel() const {

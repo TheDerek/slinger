@@ -180,7 +180,6 @@ float Physics::toDegrees(float deg) {
 void Physics::manageMovement(entt::entity entity, b2Body &body, Movement &movement) {
     if (!isOnFloor(entity)) {
         movement.direction = 0;
-        movement.jumping = false;
         return;
     }
 
