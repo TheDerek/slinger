@@ -5,12 +5,13 @@
 #ifndef SLINGER_MISC_COMPONENTS_H
 #define SLINGER_MISC_COMPONENTS_H
 
+#include <set>
 
 struct Movement {
-    float speed = 60;
-    float acceleration = 20;
-    float deceleration = 0.90f;
-    float jumpVel = 80;
+    float speed = 6;
+    float acceleration = 2;
+    float deceleration = 0.09f;
+    float jumpVel = 8;
 
     bool jumping = false;
     float direction = 0;
@@ -20,11 +21,24 @@ struct Movement {
     }
 };
 
+struct Follow
+{
+    int x = 1;
+};
+
 struct HoldingRope {
     sf::Vector2f ropeLoc;
     entt::entity rope;
 };
 
+
+struct Attachments {
+    std::set<entt::entity> entities;
+};
+
+struct Position {
+    sf::Vector2f value;
+};
 
 template <class T>
 struct Event {

@@ -15,7 +15,7 @@
 
 Physics::Physics(entt::registry &registry, entt::dispatcher &dispatcher) :
     registry_(registry), dispatcher_(dispatcher),
-    world_(b2Vec2(0, -200.f)) {
+    world_(b2Vec2(0, -20.f)) {
     world_.SetContactListener(new ContactListener());
 
     dispatcher_.sink<Event<FireRope>>().connect<&Physics::fireRope>(*this);
@@ -25,7 +25,7 @@ Physics::Physics(entt::registry &registry, entt::dispatcher &dispatcher) :
 const float Physics::TIME_STEP = 1 / 60.f;
 
 void Physics::handlePhysics(entt::registry &registry, float delta, const sf::Vector2f &mousePos) {
-    world_.Step(TIME_STEP, 6, 18);
+    world_.Step(TIME_STEP, 6, 6);
 
     dispatcher_.update();
 
@@ -52,13 +52,17 @@ void Physics::handlePhysics(entt::registry &registry, float delta, const sf::Vec
 
             if (auto* rope = registry.try_get<HoldingRope>(entity)) {
                 body->SetFixedRotation(false);
-                body->SetAngularDamping(0.7f);
                 //this->rotateToPoint(*body, rope->ropeLoc);
             }
             else if (registry.has<entt::tag<"rotate_to_mouse"_hs>>(entity)) {
                 body->SetFixedRotation(true);
                 this->rotateToPoint(*body, mousePos);
             }
+
+            // Attach a general position to this body so that the camera can follow it
+            // without having to know about the physics
+            registry_.get_or_emplace<Position>(entity).value.x = body->GetPosition().x;
+            registry_.get_or_emplace<Position>(entity).value.y = body->GetPosition().y;
         }
     );
 
@@ -199,14 +203,7 @@ void Physics::manageMovement(entt::entity entity, b2Body &body, Movement &moveme
     float impulse = body.GetMass() * velChange;
     body.ApplyLinearImpulseToCenter(b2Vec2(impulse, 0), false);
 
-    if (movement.jumping) {
-        std::cout << "Gonna jump!" << std::endl;
-        impulse = body.GetMass() * movement.jumpVel;
-        body.ApplyLinearImpulseToCenter(b2Vec2(0, impulse), false);
-    }
-
     movement.direction = 0;
-    movement.jumping = false;
 }
 
 BodyPtr &Physics::makeBody(entt::entity entity, sf::Vector2f pos, float rot, b2BodyType type) {
@@ -226,8 +223,6 @@ void Physics::rotateToPoint(b2Body &body, const sf::Vector2f &mousePos) {
 
 void Physics::fireRope(Event<FireRope> event) {
     if (auto* rope = registry_.try_get<HoldingRope>(event.entity)) {
-//        registry_.remove<JointPtr>(rope->rope);
-//        registry_.remove<Drawable>(rope->rope);
         registry_.destroy(rope->rope);
         registry_.remove<HoldingRope>(event.entity);
         return;
@@ -302,6 +297,12 @@ float RopeHitCallback::ReportFixture(
     const b2Vec2 &normal,
     float fraction) {
 
+    entt::entity hitEntity = static_cast<FixtureInfo *>(fixture->GetUserData())->entity;
+
+    if (registry_.get<Attachments>(entity_).entities.contains(hitEntity)) {
+        return -1;
+    }
+
     b2RopeJointDef jointDef;
     jointDef.bodyA = fixture->GetBody();
     jointDef.localAnchorA = fixture->GetBody()->GetLocalPoint(point);
@@ -317,7 +318,7 @@ float RopeHitCallback::ReportFixture(
     auto joint = JointPtr(world_.CreateJoint(&jointDef));
     registry_.emplace<JointPtr>(rope, std::move(joint));
 
-    auto width = 1.f;
+    auto width = 0.1f;
 
     auto drawable = Drawable{
         std::make_unique<sf::RectangleShape>(sf::Vector2f(16, width)),

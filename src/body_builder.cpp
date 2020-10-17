@@ -136,6 +136,9 @@ entt::entity BodyBuilder::create() {
         def.collideConnected = false;
         def.enableLimit = false;
         physics_.getWorld().CreateJoint(&def);
+
+        registry_.get_or_emplace<Attachments>(entity_).entities.emplace(attachPrototype_->body);
+        registry_.get_or_emplace<Attachments>(attachPrototype_->body).entities.emplace(entity_);
     }
 
     return entity_;

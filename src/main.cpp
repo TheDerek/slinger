@@ -12,27 +12,23 @@
 
 sf::Color WHITE = sf::Color(255, 255, 255);
 
-struct Position {
-    sf::Vector2f value;
-};
-
 void create(entt::registry &registry, Physics &physics) {
-    // The floor
-    BodyBuilder(registry, physics)
-        .setPos(0, -30)
-        .setType(b2_staticBody)
-        .addRect(200, 5)
-            .makeFixture()
-            .draw()
-            .setColor(sf::Color(255, 100, 50))
-            .create()
-        .create();
+//    // The floor
+//    BodyBuilder(registry, physics)
+//        .setPos(0, -30)
+//        .setType(b2_staticBody)
+//        .addRect(200, 5)
+//            .makeFixture()
+//            .draw()
+//            .setColor(sf::Color(255, 100, 50))
+//            .create()
+//        .create();
 
     // The roof
     BodyBuilder(registry, physics)
-        .setPos(0, 30)
+        .setPos(0, 3)
         .setType(b2_staticBody)
-        .addRect(100, 5)
+        .addRect(10, 0.5f)
             .makeFixture()
             .draw()
             .setColor(sf::Color(255, 100, 50))
@@ -41,16 +37,16 @@ void create(entt::registry &registry, Physics &physics) {
 
     // The rectangle player
     auto player = BodyBuilder(registry, physics)
-        .setPos(0, 0)
+        .setPos(0, 4)
         .setFixedRotation(true)
-        .addRect(10, 20)
+        .addRect(1, 2)
             .setColor(sf::Color(100, 200, 50))
             .makeFixture()
             .draw()
             .setZIndex(0)
             .create()
-        .addRect(8, 1)
-            .setPos(0, -10)
+        .addRect(0.8f, 0.1f)
+            .setPos(0, -1)
             .setSensor()
             .setColor(sf::Color(255, 255, 255))
             .makeFixture()
@@ -60,27 +56,30 @@ void create(entt::registry &registry, Physics &physics) {
             .create()
         .create();
 
+    // Follow the player
+    registry.emplace<Follow>(player);
+
     // Add movement to player
     registry.emplace<Movement>(player);
     registry.emplace<InputComponent>(
         player, InputComponent {
             {sf::Keyboard::Key::A, InputAction::WALK_LEFT},
             {sf::Keyboard::Key::D, InputAction::WALK_RIGHT},
-            {JustPressed(sf::Keyboard::Space), Jump { 80 } }
+            {JustPressed(sf::Keyboard::Space), Jump { 8 } }
         });
 
     // The players arm
     auto arm = BodyBuilder(registry, physics)
-        .addRect(3, 10)
+        .addRect(0.3f, 1)
             .setColor(sf::Color(255, 255, 255))
             .setSensor()
             .makeFixture()
             .draw()
             .setZIndex(1)
             .setDensity(0)
-            .setPos(0, 4.f)
+            .setPos(0, 0.4f)
             .create()
-        .attach(player, 0, 7, 0, 0)
+        .attach(player, 0, 0.7f, 0, 0)
         .setFixedRotation(true)
         .create();
 
@@ -89,8 +88,8 @@ void create(entt::registry &registry, Physics &physics) {
     registry.emplace<InputComponent>(arm, InputComponent {
         {
             JustPressed(sf::Mouse::Left), FireRope {
-                sf::Vector2f(0, 5),
-                sf::Vector2f(0, 7)
+                sf::Vector2f(0, 0.5f),
+                sf::Vector2f(0, 0.7f)
             }
         }
     });

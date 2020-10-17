@@ -11,7 +11,7 @@ Illustrator::Illustrator(sf::RenderWindow &window, entt::registry &registry, ent
     window_(window),
     registry_(registry),
     dispatcher_(dispatcher),
-    camera_(sf::Vector2f(0.f, 0.f), sf::Vector2f(800.f, -600.f) / 5.f)
+    camera_(sf::Vector2f(0.f, 0.f), sf::Vector2f(80.f, -60.f) / 3.f)
 {
     window_.setView(camera_);
     dispatcher_.sink<Event<FireRope>>().connect<&Illustrator::addRope>(*this);
@@ -23,6 +23,8 @@ Illustrator::Illustrator(sf::RenderWindow &window, entt::registry &registry, ent
 }
 
 void Illustrator::onAddDrawable(entt::registry& registry, entt::entity entity) {
+    std::cout << "Sorting by z index" << std::endl;
+
     // Sort drawable entities by z index
     registry_.sort<Drawable>(
         [](const auto &lhs, const auto &rhs) {
@@ -35,8 +37,15 @@ void Illustrator::onAddDrawable(entt::registry& registry, entt::entity entity) {
 
 void Illustrator::draw(entt::registry &registry) {
     window_.clear(sf::Color::Black);
-    window_.setView(camera_);
     window_.setFramerateLimit(60);
+
+    registry.view<Follow, Position>().each(
+        [this](const auto entity, const Follow& follow, const Position& position) {
+            this->camera_.setCenter(position.value);
+        }
+    );
+
+    window_.setView(camera_);
 
     registry.view<Drawable>().each(
         [this, &registry](const auto entity, const Drawable &drawable) {
@@ -48,10 +57,6 @@ void Illustrator::draw(entt::registry &registry) {
             }
 
             window_.draw(*drawable.value);
-
-            if (registry.try_get<Follow>(entity)) {
-                camera_.setCenter(drawable.value->getPosition());
-            }
         }
     );
 

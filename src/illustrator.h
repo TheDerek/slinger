@@ -20,11 +20,6 @@ struct Drawable {
     int zIndex = 0;
 };
 
-struct Follow
-{
-    int x = 1;
-};
-
 class Illustrator
 {
     sf::View camera_;
