@@ -24,9 +24,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="15.839192"
-     inkscape:cx="81.367813"
-     inkscape:cy="18.68376"
+     inkscape:zoom="11.2"
+     inkscape:cx="51.823676"
+     inkscape:cy="21.913608"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
@@ -53,10 +53,10 @@
      inkscape:groupmode="layer"
      id="layer1">
     <rect
-       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.180155;stroke-opacity:1"
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26489;stroke-opacity:1"
        id="rect1429"
        width="16.351263"
-       height="6.6073666"
+       height="14.284524"
        x="15.806681"
        y="13.871841"
        ry="0" />
@@ -72,18 +72,18 @@
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
        id="rect1433"
        width="15.392158"
-       height="5.2558594"
+       height="18.488855"
        x="43.495583"
        y="15.335974"
        ry="0" />
     <rect
        ry="0"
        y="13.871841"
-       x="4.8444605"
-       height="6.6073661"
-       width="9.1432257"
+       x="-5.8059402"
+       height="14.18351"
+       width="19.793627"
        id="rect1429-3"
-       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.181417;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.391082;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <rect
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.147337;stroke-opacity:1"
        id="overhang-rect"
@@ -96,7 +96,7 @@
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
        id="rect1433-6"
        width="15.392158"
-       height="5.2558594"
+       height="30.206623"
        x="75.178917"
        y="17.836355"
        ry="0" />
@@ -112,7 +112,7 @@
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
        id="rect1433-6-5-3"
        width="20.240889"
-       height="1.4172766"
+       height="20.913223"
        x="112.43632"
        y="27.853424"
        ry="0" />
