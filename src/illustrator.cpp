@@ -23,8 +23,6 @@ Illustrator::Illustrator(sf::RenderWindow &window, entt::registry &registry, ent
 }
 
 void Illustrator::onAddDrawable(entt::registry& registry, entt::entity entity) {
-    std::cout << "Sorting by z index" << std::endl;
-
     // Sort drawable entities by z index
     registry_.sort<Drawable>(
         [](const auto &lhs, const auto &rhs) {
