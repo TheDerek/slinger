@@ -232,6 +232,12 @@ void Physics::fireRope(Event<FireRope> event) {
     auto startingPos = body->GetWorldPoint(tob2(event.eventDef.localPos));
     auto endingPos = tob2(event.eventDef.target);
 
+    // Increase the length the rope can be fired to
+    auto dir = (endingPos - startingPos);
+    dir = b2Vec2(dir.x / dir.Length(), dir.y / dir.Length());
+    dir = b2Vec2(dir.x * 100.f, dir.y * 100.f);
+    endingPos += dir;
+
     // TODO Figure out why this doesn't segfault when c goes out of scope
     RopeHitCallback c(registry_, event.entity, world_, event.eventDef.localFireLoc);
     world_.RayCast(&c, startingPos, endingPos);

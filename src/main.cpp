@@ -98,7 +98,7 @@ void create(entt::registry &registry, Physics &physics) {
 int main() {
     std::cout << "Hello, World!" << std::endl;
 
-    sf::RenderWindow window(sf::VideoMode(800, 600), "SFML window");
+    sf::RenderWindow window(sf::VideoMode(1000, 800), "SFML window");
     window.setKeyRepeatEnabled(false);
 
     entt::registry registry;
