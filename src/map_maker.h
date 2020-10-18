@@ -32,6 +32,8 @@ public:
 
     void makePlayer(const pugi::xml_node &node);
     void makeRect(const pugi::xml_node& node);
+
+    void makeDeathZone(const pugi::xml_node &node);
 };
 
 /**

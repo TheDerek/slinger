@@ -34,6 +34,7 @@ struct FixtureInfo {
     float angleOffset;
     sf::Vector2f posOffset;
     entt::entity entity;
+    entt::entity bodyEntity;
     int numberOfContacts = 0;
 };
 
@@ -45,6 +46,13 @@ struct FootSensor {
 
 
 class ContactListener : public b2ContactListener {
+    entt::registry& registry_;
+    entt::dispatcher &dispatcher_;
+
+public:
+    ContactListener(entt::registry &registry, entt::dispatcher &dispatcher);
+
+private:
     void BeginContact(b2Contact *contact) override;
     void EndContact(b2Contact *contact) override;
 };

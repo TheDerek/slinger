@@ -24,11 +24,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.6126257"
-     inkscape:cx="374.88759"
-     inkscape:cy="26.869749"
+     inkscape:zoom="10.450503"
+     inkscape:cx="217.8515"
+     inkscape:cy="48.668015"
      inkscape:document-units="px"
-     inkscape:current-layer="layer2"
+     inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
      showgrid="false"
      inkscape:window-width="2560"
@@ -53,7 +53,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -135,7 +135,7 @@
        id="rect1429-3-3"
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.328051;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <rect
-       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke;font-variation-settings:normal;opacity:1;vector-effect:none;stroke-linecap:butt;stroke-linejoin:miter;stroke-dashoffset:0;stop-color:#000000;stop-opacity:1"
        id="rect1433-6-5-6"
        width="2.0581434"
        height="35.930061"
@@ -270,11 +270,35 @@
        x="551.25848"
        y="91.936508"
        ry="0" />
+    <rect
+       style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke;stop-color:#000000;stop-opacity:1"
+       id="rect1433-6-5-6-6"
+       width="4.0068173"
+       height="30.727217"
+       x="167.1761"
+       y="19.354334"
+       ry="0" />
+    <rect
+       style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke;stop-color:#000000;stop-opacity:1"
+       id="rect1433-6-5-6-6-7"
+       width="4.0068173"
+       height="27.05275"
+       x="437.7088"
+       y="68.320007"
+       ry="0" />
+    <rect
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+       id="rect1433-6-5-5-3"
+       width="21.529984"
+       height="27.485783"
+       x="205.52336"
+       y="20.776134"
+       ry="0" />
   </g>
   <g
      inkscape:groupmode="layer"
      id="layer2"
-     inkscape:label="death"
+     inkscape:label="death_zones"
      style="opacity:0.529922"
      transform="translate(-0.13674727,-0.71261972)">
     <rect
@@ -368,8 +392,8 @@
        id="player"
        width="1"
        height="2"
-       x="18.850197"
-       y="22.704145"
+       x="96.932564"
+       y="27.426479"
        ry="0" />
   </g>
 </svg>

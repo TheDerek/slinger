@@ -28,6 +28,9 @@ struct HoldingRope {
     entt::entity rope;
 };
 
+struct DeathZone {
+
+};
 
 struct Attachments {
     std::set<entt::entity> entities;
@@ -43,6 +46,10 @@ struct Event {
     T eventDef;
 
     Event(entt::entity entity, T eventDef): entity(entity), eventDef(eventDef) {};
+};
+
+struct Death {
+
 };
 
 struct FireRope {

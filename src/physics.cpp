@@ -16,7 +16,7 @@
 Physics::Physics(entt::registry &registry, entt::dispatcher &dispatcher) :
     registry_(registry), dispatcher_(dispatcher),
     world_(b2Vec2(0, -20.f)) {
-    world_.SetContactListener(new ContactListener());
+    world_.SetContactListener(new ContactListener(registry_, dispatcher_));
 
     dispatcher_.sink<Event<FireRope>>().connect<&Physics::fireRope>(*this);
     dispatcher_.sink<Event<Jump>>().connect<&Physics::jump>(*this);
@@ -156,7 +156,8 @@ FixtureInfoPtr &Physics::makeFixture(
             FixturePtr((*body)->CreateFixture(&fixtureDef)),
             shape->getRotation(),
             shape->getPosition(),
-            entity
+            entity,
+            bodyEntity
         }
     );
 
@@ -280,6 +281,12 @@ void ContactListener::BeginContact(b2Contact *contact) {
 
     fixA->numberOfContacts += 1;
     fixB->numberOfContacts += 1;
+
+    if (registry_.has<DeathZone>(fixA->bodyEntity)) {
+        std::cout << "\t " << (long) fixB->bodyEntity << " entered the death zone!" << std::endl;
+        dispatcher_.enqueue(Event(fixB->bodyEntity, Death()));
+    }
+
 }
 
 void ContactListener::EndContact(b2Contact *contact) {
@@ -289,6 +296,9 @@ void ContactListener::EndContact(b2Contact *contact) {
     fixA->numberOfContacts -= 1;
     fixB->numberOfContacts -= 1;
 }
+
+ContactListener::ContactListener(entt::registry &registry, entt::dispatcher &dispatcher)
+    : registry_(registry), dispatcher_(dispatcher) {}
 
 void JointDeleter::operator()(b2Joint *joint) const {
     joint->GetBodyA()->GetWorld()->DestroyJoint(joint);

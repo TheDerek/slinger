@@ -30,10 +30,15 @@ void MapMaker::make(const std::string& path)
     }
 
     auto walls = doc.select_nodes("/svg/g[@inkscape:label='walls']/rect");
-
     std::cout << "Number of walls: " << walls.size() << std::endl;
     for (const auto& wall: walls) {
         mapShapeBuilder_.makeRect(wall.node());
+    }
+
+    auto deathZones = doc.select_nodes("/svg/g[@inkscape:label='death_zones']/rect");
+    std::cout << "Number of death zones: " << deathZones.size() << std::endl;
+    for (const auto& zone: deathZones) {
+        mapShapeBuilder_.makeDeathZone(zone.node());
     }
 
     auto playerNode = doc.select_node("/svg/g[@inkscape:label='objects']/rect[@id='player']");
@@ -58,8 +63,6 @@ void MapShapeBuilder::makeRect(const pugi::xml_node& node) {
             .setZIndex(0)
             .create()
         .create();
-
-    std::cout << "Created rect " << node.attribute("id").as_string() << std::endl;
 }
 
 MapShapeBuilder::MapShapeBuilder(entt::registry &registry, Physics &physics):
@@ -71,7 +74,6 @@ MapShapeBuilder::MapShapeBuilder(entt::registry &registry, Physics &physics):
 
 void MapShapeBuilder::makePlayer(const pugi::xml_node &node) {
     Dimensions dimensions(node);
-
 
     // The rectangle player
     auto player = BodyBuilder(registry_, physics_)
@@ -132,4 +134,20 @@ void MapShapeBuilder::makePlayer(const pugi::xml_node &node) {
         }
         }
     });
+}
+
+void MapShapeBuilder::makeDeathZone(const pugi::xml_node &node) {
+    Dimensions dimensions(node);
+
+    auto entity = BodyBuilder(registry_, physics_)
+        .setPos(dimensions.x, dimensions.y)
+        .setType(b2_staticBody)
+        .addRect(dimensions.width, dimensions.height)
+            .setSensor()
+            .makeFixture()
+            .setZIndex(3)
+            .create()
+        .create();
+
+    registry_.emplace<DeathZone>(entity);
 }
