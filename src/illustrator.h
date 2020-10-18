@@ -26,6 +26,8 @@ class Illustrator
     sf::RenderWindow& window_;
     entt::dispatcher& dispatcher_;
     entt::registry& registry_;
+    sf::Font font_;
+    sf::Text text_;
 
 public:
     explicit Illustrator(sf::RenderWindow &window, entt::registry &registry, entt::dispatcher &dispatcher);

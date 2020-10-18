@@ -6,6 +6,14 @@
 #include "body_builder.h"
 #include "input_manager.h"
 
+Dimensions::Dimensions(const pugi::xml_node &node) {
+    width = node.attribute("width").as_float();
+    height = node.attribute("height").as_float();
+    x = node.attribute("x").as_float();
+    y = node.attribute("y").as_float() * -1.f;
+    x += width/2.f;
+    y -= height/2.f;
+}
 
 MapMaker::MapMaker(entt::registry &registry, Physics &physics): mapShapeBuilder_(MapShapeBuilder(registry, physics))
 {
@@ -37,24 +45,18 @@ void MapMaker::make(const std::string& path)
 }
 
 void MapShapeBuilder::makeRect(const pugi::xml_node& node) {
-    float width = node.attribute("width").as_float();
-    float height = node.attribute("height").as_float();
-    float x = node.attribute("x").as_float();
-    float y = node.attribute("y").as_float() * -1.f;
-    x += width/2.f;
-    y -= height/2.f;
-
     sf::Color RED = sf::Color(255, 100, 50);
+    Dimensions dimensions(node);
 
     BodyBuilder(registry_, physics_)
-        .setPos(x, y)
+        .setPos(dimensions.x, dimensions.y)
         .setType(b2_staticBody)
-        .addRect(width, height)
-        .setColor(RED)
-        .draw()
-        .makeFixture()
-        .setZIndex(0)
-        .create()
+        .addRect(dimensions.width, dimensions.height)
+            .setColor(RED)
+            .draw()
+            .makeFixture()
+            .setZIndex(0)
+            .create()
         .create();
 
     std::cout << "Created rect " << node.attribute("id").as_string() << std::endl;
@@ -68,16 +70,12 @@ MapShapeBuilder::MapShapeBuilder(entt::registry &registry, Physics &physics):
 }
 
 void MapShapeBuilder::makePlayer(const pugi::xml_node &node) {
-    float width = node.attribute("width").as_float();
-    float height = node.attribute("height").as_float();
-    float x = node.attribute("x").as_float();
-    float y = node.attribute("y").as_float() * -1.f;
-    x += width/2.f;
-    y -= height/2.f;
+    Dimensions dimensions(node);
+
 
     // The rectangle player
     auto player = BodyBuilder(registry_, physics_)
-        .setPos(x, y)
+        .setPos(dimensions.x, dimensions.y)
         .setFixedRotation(true)
         .addRect(1, 2)
             .setColor(sf::Color(100, 200, 50))
@@ -110,6 +108,7 @@ void MapShapeBuilder::makePlayer(const pugi::xml_node &node) {
 
     // The players arm
     auto arm = BodyBuilder(registry_, physics_)
+        .setPos(dimensions.x, dimensions.y)
         .addRect(0.3f, 1)
             .setColor(sf::Color(255, 255, 255))
             .setSensor()

@@ -5,6 +5,8 @@
 #include "illustrator.h"
 
 #include <iostream>
+#include <stdio.h>
+
 #include <entt/entity/helper.hpp>
 
 Illustrator::Illustrator(sf::RenderWindow &window, entt::registry &registry, entt::dispatcher &dispatcher) :
@@ -13,13 +15,20 @@ Illustrator::Illustrator(sf::RenderWindow &window, entt::registry &registry, ent
     dispatcher_(dispatcher),
     camera_(sf::Vector2f(0.f, 0.f), sf::Vector2f(80.f, -60.f) / 3.f)
 {
-    window_.setView(camera_);
+    //window_.setView(camera_);
     dispatcher_.sink<Event<FireRope>>().connect<&Illustrator::addRope>(*this);
 
     registry_.on_construct<Drawable>().connect<&Illustrator::onAddDrawable>(this);
     registry_.on_destroy<Drawable>().connect<&Illustrator::onAddDrawable>(this);
 
+    if (!font_.loadFromFile("data/LiberationMono-Regular.ttf"))
+    {
+        throw std::runtime_error("Could not locate font");
+    }
 
+    text_.setFont(font_);
+    text_.setCharacterSize(24);
+    text_.setFillColor(sf::Color::White);
 }
 
 void Illustrator::onAddDrawable(entt::registry& registry, entt::entity entity) {
@@ -58,7 +67,18 @@ void Illustrator::draw(entt::registry &registry) {
         }
     );
 
+    window_.setView(window_.getDefaultView());
+    registry.view<Follow, Position>().each(
+        [this](const auto entity, const Follow& follow, const Position& position) {
+            text_.setString("(" + std::to_string(position.value.x) + ", " + std::to_string(position.value.y) + ")");
+            text_.setPosition(0, 0);
+            text_.setScale(1.f, 1.f);
+            window_.draw(text_);
+        }
+    );
+
     window_.display();
+    window_.setView(camera_);
 }
 
 float Illustrator::round(float number, float multiple) {

@@ -10,6 +10,16 @@
 #include "pugixml.hpp"
 
 
+struct Dimensions {
+    float x;
+    float y;
+    float width;
+    float height;
+
+    Dimensions(const pugi::xml_node &node);
+};
+
+
 /**
  * Builds Box2d bodies from svg shapes
  */

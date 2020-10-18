@@ -25,7 +25,7 @@ Physics::Physics(entt::registry &registry, entt::dispatcher &dispatcher) :
 const float Physics::TIME_STEP = 1 / 60.f;
 
 void Physics::handlePhysics(entt::registry &registry, float delta, const sf::Vector2f &mousePos) {
-    world_.Step(TIME_STEP, 6, 6);
+    world_.Step(TIME_STEP, 15, 15);
 
     dispatcher_.update();
 
@@ -231,11 +231,13 @@ void Physics::fireRope(Event<FireRope> event) {
     auto startingPos = body->GetWorldPoint(tob2(event.eventDef.localPos));
     auto endingPos = tob2(event.eventDef.target);
 
+    auto scale = 10.f;
+
     // Increase the length the rope can be fired to
     auto dir = (endingPos - startingPos);
     dir = b2Vec2(dir.x / dir.Length(), dir.y / dir.Length());
-    dir = b2Vec2(dir.x * 100.f, dir.y * 100.f);
-    endingPos += dir;
+    dir = b2Vec2(dir.x * scale, dir.y * scale);
+    endingPos = startingPos + dir;
 
     // TODO Figure out why this doesn't segfault when c goes out of scope
     RopeHitCallback c(registry_, event.entity, world_, event.eventDef.localFireLoc);
