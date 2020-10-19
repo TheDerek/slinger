@@ -6,6 +6,7 @@
 #define SLINGER_MISC_COMPONENTS_H
 
 #include <set>
+#include <SFML/System/Time.hpp>
 
 struct Movement {
     float speed = 10;
@@ -40,7 +41,12 @@ struct Checkpoint {
 
 struct Respawnable {
     sf::Vector2f lastCheckpointLoc;
+    sf::Time respawnTime;
+    sf::Time currentRespawnTime;
     bool dead = false;
+
+    inline explicit Respawnable(sf::Vector2f lastCheckpointLoc, sf::Time respawnTime):
+        lastCheckpointLoc(lastCheckpointLoc), respawnTime(respawnTime) {};
 };
 
 struct Attachments {

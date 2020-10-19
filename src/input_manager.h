@@ -73,8 +73,6 @@ private:
     entt::dispatcher& dispatcher_;
     std::set<sf::Keyboard::Key> firstTimeKeyPresses_;
     std::set<sf::Mouse::Button> firstTimeButtonPresses_;
-
-    void onAddInputComponent(entt::registry& registry, entt::entity);
 };
 
 

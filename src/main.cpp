@@ -1,23 +1,26 @@
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
+
 #include <iostream>
 #include <memory>
 
+#include <spdlog/spdlog.h>
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #include <entt/entt.hpp>
+
 #include "physics.h"
 #include "illustrator.h"
 #include "input_manager.h"
-#include "misc_components.h"
-#include "body_builder.h"
 #include "map_maker.h"
 #include "checkpoint_manager.h"
 
-sf::Color WHITE = sf::Color(255, 255, 255);
-
 int main() {
-    std::cout << "Hello, World!" << std::endl;
+    spdlog::set_level(spdlog::level::debug);
+    spdlog::set_pattern("%Y-%m-%d %@ %! [%l] %v");
 
-    sf::RenderWindow window(sf::VideoMode(1000, 800), "SFML window");
+    SPDLOG_INFO("Starting game");
+
+    sf::RenderWindow window(sf::VideoMode(1000, 800), "Slinger DEV build");
     window.setKeyRepeatEnabled(false);
 
     entt::registry registry;
@@ -39,12 +42,13 @@ int main() {
         action = inputManager.handleInput();
 
         // Clear screen
-        window.clear(WHITE);
+        window.clear(sf::Color::White);
 
         // Get the mouse pos
         sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
         auto delta = deltaClock.restart();
+        checkpointManager.update(delta);
         physics.handlePhysics(registry, delta.asSeconds(), mousePos);
         illustrator.draw(registry);
 

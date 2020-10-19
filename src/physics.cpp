@@ -26,7 +26,7 @@ Physics::Physics(entt::registry &registry, entt::dispatcher &dispatcher) :
 const float Physics::TIME_STEP = 1 / 60.f;
 
 void Physics::handlePhysics(entt::registry &registry, float delta, const sf::Vector2f &mousePos) {
-    world_.Step(TIME_STEP, 15, 15);
+    world_.Step(TIME_STEP, 30, 15);
 
     dispatcher_.update();
 
@@ -233,6 +233,7 @@ void Physics::fireRope(Event<FireRope> event) {
     auto startingPos = body->GetWorldPoint(tob2(event.eventDef.localPos));
     auto endingPos = tob2(event.eventDef.target);
 
+    // TODO: Split this up into multiple smaller raycasts to avoid clipping
     auto scale = 10.f;
 
     // Increase the length the rope can be fired to
@@ -356,9 +357,14 @@ float RopeHitCallback::ReportFixture(
 
     entt::entity hitEntity = static_cast<FixtureInfo *>(fixture->GetUserData())->entity;
 
-    if (registry_.get<Attachments>(entity_).entities.contains(hitEntity)) {
+    // Not interested in attaching to sensors
+    if (fixture->IsSensor()) {
         return -1;
     }
+
+//    if (registry_.get<Attachments>(entity_).entities.contains(hitEntity)) {
+//        return -1;
+//    }
 
     b2RopeJointDef jointDef;
     jointDef.bodyA = fixture->GetBody();

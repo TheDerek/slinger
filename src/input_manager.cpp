@@ -9,7 +9,6 @@
 InputManager::InputManager(sf::RenderWindow &window, entt::dispatcher& dispatcher, entt::registry& registry) :
     window_(window), dispatcher_(dispatcher), registry_(registry) {
 
-    registry_.on_construct<InputComponent>().connect<&InputManager::onAddInputComponent>(this);
 }
 
 UIAction InputManager::handleInput() {
@@ -91,12 +90,6 @@ void InputManager::handleMovement(entt::entity entity, InputAction action, Movem
     if (action == InputAction::WALK_LEFT) {
         movement.direction -= 1;
     }
-}
-
-void InputManager::onAddInputComponent(entt::registry& registry, entt::entity entity) {
-    std::cout << "wohoo adding input component" << std::endl;
-
-    auto& inputComponent = registry.get<InputComponent>(entity);
 }
 
 void InputManager::operator()(InputAction action) const {

@@ -1,4 +1,7 @@
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
+
 #include <iostream>
+#include <spdlog/spdlog.h>
 
 #include "pugixml.hpp"
 
@@ -30,19 +33,19 @@ void MapMaker::make(const std::string& path)
     }
 
     auto walls = doc.select_nodes("/svg/g[@inkscape:label='walls']/rect");
-    std::cout << "Number of walls: " << walls.size() << std::endl;
+    SPDLOG_DEBUG("Added {} walls from {}", walls.size(), path);
     for (const auto& wall: walls) {
         mapShapeBuilder_.makeRect(wall.node());
     }
 
     auto deathZones = doc.select_nodes("/svg/g[@inkscape:label='death_zones']/rect");
-    std::cout << "Number of death zones: " << deathZones.size() << std::endl;
+    SPDLOG_DEBUG("Added {} death zones from {}", deathZones.size(), path);
     for (const auto& zone: deathZones) {
         mapShapeBuilder_.makeDeathZone(zone.node());
     }
 
     auto checkPoints = doc.select_nodes("/svg/g[@inkscape:label='checkpoints']/rect");
-    std::cout << "Number of checkpoints: " << checkPoints.size() << std::endl;
+    SPDLOG_DEBUG("Added {} checkpoints from {}", checkPoints.size(), path);
     for (const auto& zone: checkPoints) {
         mapShapeBuilder_.makeCheckpoint(zone.node());
     }
@@ -53,6 +56,8 @@ void MapMaker::make(const std::string& path)
     }
 
     mapShapeBuilder_.makePlayer(playerNode.node());
+
+    SPDLOG_INFO("Successfully loaded {} as the current level", path);
 }
 
 MapShapeBuilder::MapShapeBuilder(entt::registry &registry, Physics &physics):
@@ -88,7 +93,7 @@ void MapShapeBuilder::makePlayer(const pugi::xml_node &node) {
 
     // Follow the player and enable checkpoints
     registry_.emplace<Follow>(player);
-    registry_.emplace<Respawnable>(player, Respawnable {sf::Vector2f(dimensions.x, dimensions.y)});
+    registry_.emplace<Respawnable>(player, sf::Vector2f(dimensions.x, dimensions.y), sf::seconds(2));
 
     // Add movement to player
     registry_.emplace<Movement>(player);
@@ -152,9 +157,9 @@ void MapShapeBuilder::makeDeathZone(const pugi::xml_node &node) {
             .addRect(dimensions.width, dimensions.height)
             .setSensor()
             .makeFixture()
-            .setColor(sf::Color(200, 100, 100, 100))
-            .setZIndex(3)
-            .draw()
+//            .setColor(sf::Color(200, 100, 100, 100))
+//            .setZIndex(3)
+//            .draw()
             .create()
         .create();
 
@@ -170,9 +175,9 @@ void MapShapeBuilder::makeCheckpoint(const pugi::xml_node &node) {
         .addRect(dimensions.width, dimensions.height)
             .setSensor()
             .makeFixture()
-            .setColor(sf::Color(100, 200, 100, 100))
-            .setZIndex(3)
-            .draw()
+//            .setColor(sf::Color(100, 200, 100, 100))
+//            .setZIndex(3)
+//            .draw()
             .create()
         .create();
 

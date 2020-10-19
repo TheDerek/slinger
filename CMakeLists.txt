@@ -12,4 +12,4 @@ find_package(EnTT REQUIRED)
 find_package(pugixml REQUIRED)
 find_package(spdlog REQUIRED)
 
-target_link_libraries(slinger sfml-graphics sfml-audio sfml-system sfml-window ${EnTTTargets} box2d pugixml spdlog)
+target_link_libraries(slinger PRIVATE sfml-graphics sfml-audio sfml-system sfml-window ${EnTTTargets} box2d pugixml spdlog::spdlog)

@@ -22,8 +22,11 @@ class CheckpointManager {
 
     void onDeathZone(const EnteredDeathZone &event);
     void onCheckpoint(const EnteredCheckpoint &event);
+    void respawn(entt::entity, Respawnable& respawnable);
+    void despawn(entt::entity, Respawnable& respawnable);
 public:
     CheckpointManager(entt::registry &registry, entt::dispatcher &dispatcher);
+    void update(sf::Time delta);
 };
 
 
