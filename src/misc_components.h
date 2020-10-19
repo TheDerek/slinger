@@ -29,7 +29,18 @@ struct HoldingRope {
 };
 
 struct DeathZone {
+    int x;
+};
 
+struct Checkpoint {
+    sf::Vector2f respawnLoc;
+
+    inline explicit Checkpoint(sf::Vector2f respawnLoc): respawnLoc(respawnLoc) {};
+};
+
+struct Respawnable {
+    sf::Vector2f lastCheckpointLoc;
+    bool dead = false;
 };
 
 struct Attachments {
@@ -40,32 +51,6 @@ struct Position {
     sf::Vector2f value;
 };
 
-template <class T>
-struct Event {
-    entt::entity entity;
-    T eventDef;
 
-    Event(entt::entity entity, T eventDef): entity(entity), eventDef(eventDef) {};
-};
-
-struct Death {
-
-};
-
-struct FireRope {
-    // Set by the creator
-    //-------------------
-    sf::Vector2f localPos;
-    // The local location on the body to attach the rope to if it hits something
-    sf::Vector2f localFireLoc;
-
-    // Set by the input controller
-    //----------------------------
-    sf::Vector2f target;
-};
-
-struct Jump {
-    float impulse = 80;
-};
 
 #endif //SLINGER_MISC_COMPONENTS_H

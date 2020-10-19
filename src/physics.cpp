@@ -20,6 +20,7 @@ Physics::Physics(entt::registry &registry, entt::dispatcher &dispatcher) :
 
     dispatcher_.sink<Event<FireRope>>().connect<&Physics::fireRope>(*this);
     dispatcher_.sink<Event<Jump>>().connect<&Physics::jump>(*this);
+    dispatcher_.sink<Event<Teleport>>().connect<&Physics::teleport>(*this);
 }
 
 const float Physics::TIME_STEP = 1 / 60.f;
@@ -267,6 +268,32 @@ bool Physics::isOnFloor(entt::entity entity) {
     return foot->fixture->numberOfContacts > 0;
 }
 
+void Physics::teleport(Event<Teleport> event) {
+    if (!registry_.has<BodyPtr>(event.entity)) {
+        throw std::runtime_error("Must have a body to teleport");
+    }
+
+    BodyPtr &body = registry_.get<BodyPtr>(event.entity);
+
+    // Translate anything attached to the body
+    for (auto attachedEntity : registry_.get_or_emplace<Attachments>(event.entity).entities) {
+        BodyPtr &attachedBody = registry_.get<BodyPtr>(attachedEntity);
+
+        // Get the local pos of the attached entity so we can teleport it to the right location
+        auto localPoint = body->GetLocalPoint(attachedBody->GetPosition());
+        auto teleportLoc = tob2(event.eventDef.newLoc) + localPoint;
+        attachedBody->SetAngularVelocity(0);
+        attachedBody->SetLinearVelocity(b2Vec2_zero);
+        attachedBody->SetTransform(teleportLoc, body->GetAngle());
+    }
+
+    // Translate the body itself
+    body->SetAngularVelocity(0);
+    body->SetLinearVelocity(b2Vec2_zero);
+    body->SetTransform(tob2(event.eventDef.newLoc), body->GetAngle());
+}
+
+
 void BodyDeleter::operator()(b2Body *body) const {
     body->GetWorld()->DestroyBody(body);
 }
@@ -276,20 +303,33 @@ void FixtureDeleter::operator()(b2Fixture *fixture) const {
 }
 
 void ContactListener::BeginContact(b2Contact *contact) {
+    if (contact->GetFixtureA()->IsSensor() && contact->GetFixtureB()->IsSensor()) {
+        return;
+    }
+
     auto *fixA = static_cast<FixtureInfo *>(contact->GetFixtureA()->GetUserData());
     auto *fixB = static_cast<FixtureInfo *>(contact->GetFixtureB()->GetUserData());
 
+    // TODO: Fix collisions with checkpoint and death zones
     fixA->numberOfContacts += 1;
     fixB->numberOfContacts += 1;
 
-    if (registry_.has<DeathZone>(fixA->bodyEntity)) {
-        std::cout << "\t " << (long) fixB->bodyEntity << " entered the death zone!" << std::endl;
-        dispatcher_.enqueue(Event(fixB->bodyEntity, Death()));
+    if (auto checkpoint = registry_.try_get<Checkpoint>(fixA->bodyEntity)) {
+        dispatcher_.enqueue(Event(fixB->bodyEntity, EnteredZone<Checkpoint> {*checkpoint}));
     }
+
+    if (auto deathZone = registry_.try_get<DeathZone>(fixA->bodyEntity)) {
+        dispatcher_.enqueue(Event(fixB->bodyEntity, EnteredZone<DeathZone> {*deathZone}));
+    }
+
 
 }
 
 void ContactListener::EndContact(b2Contact *contact) {
+    if (contact->GetFixtureA()->IsSensor() && contact->GetFixtureB()->IsSensor()) {
+        return;
+    }
+
     auto *fixA = static_cast<FixtureInfo *>(contact->GetFixtureA()->GetUserData());
     auto *fixB = static_cast<FixtureInfo *>(contact->GetFixtureB()->GetUserData());
 
@@ -342,10 +382,8 @@ float RopeHitCallback::ReportFixture(
         3
     };
     drawable.value->setOrigin(0, width / 2.f);
+
     registry_.emplace<Drawable>(rope, std::move(drawable));
-
-
-
     registry_.emplace<HoldingRope>(entity_, HoldingRope { sf::Vector2f(point.x, point.y), rope });
 
     return 0;

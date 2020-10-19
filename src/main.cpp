@@ -10,6 +10,7 @@
 #include "misc_components.h"
 #include "body_builder.h"
 #include "map_maker.h"
+#include "checkpoint_manager.h"
 
 sf::Color WHITE = sf::Color(255, 255, 255);
 
@@ -21,10 +22,12 @@ int main() {
 
     entt::registry registry;
     entt::dispatcher dispatcher;
+
     Physics physics(registry, dispatcher);
     Illustrator illustrator(window, registry, dispatcher);
     InputManager inputManager(window, dispatcher, registry);
     MapMaker mapMaker(registry, physics);
+    CheckpointManager checkpointManager(registry, dispatcher);
 
     mapMaker.make("data/map.svg");
 

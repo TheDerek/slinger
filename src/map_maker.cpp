@@ -41,28 +41,18 @@ void MapMaker::make(const std::string& path)
         mapShapeBuilder_.makeDeathZone(zone.node());
     }
 
+    auto checkPoints = doc.select_nodes("/svg/g[@inkscape:label='checkpoints']/rect");
+    std::cout << "Number of checkpoints: " << checkPoints.size() << std::endl;
+    for (const auto& zone: checkPoints) {
+        mapShapeBuilder_.makeCheckpoint(zone.node());
+    }
+
     auto playerNode = doc.select_node("/svg/g[@inkscape:label='objects']/rect[@id='player']");
     if (!playerNode) {
         throw std::runtime_error("Could not find player in svg " + path);
     }
 
     mapShapeBuilder_.makePlayer(playerNode.node());
-}
-
-void MapShapeBuilder::makeRect(const pugi::xml_node& node) {
-    sf::Color RED = sf::Color(255, 100, 50);
-    Dimensions dimensions(node);
-
-    BodyBuilder(registry_, physics_)
-        .setPos(dimensions.x, dimensions.y)
-        .setType(b2_staticBody)
-        .addRect(dimensions.width, dimensions.height)
-            .setColor(RED)
-            .draw()
-            .makeFixture()
-            .setZIndex(0)
-            .create()
-        .create();
 }
 
 MapShapeBuilder::MapShapeBuilder(entt::registry &registry, Physics &physics):
@@ -96,8 +86,9 @@ void MapShapeBuilder::makePlayer(const pugi::xml_node &node) {
             .create()
         .create();
 
-    // Follow the player
+    // Follow the player and enable checkpoints
     registry_.emplace<Follow>(player);
+    registry_.emplace<Respawnable>(player, Respawnable {sf::Vector2f(dimensions.x, dimensions.y)});
 
     // Add movement to player
     registry_.emplace<Movement>(player);
@@ -136,7 +127,41 @@ void MapShapeBuilder::makePlayer(const pugi::xml_node &node) {
     });
 }
 
+void MapShapeBuilder::makeRect(const pugi::xml_node& node) {
+    sf::Color RED = sf::Color(255, 100, 50);
+    Dimensions dimensions(node);
+
+    BodyBuilder(registry_, physics_)
+        .setPos(dimensions.x, dimensions.y)
+        .setType(b2_staticBody)
+        .addRect(dimensions.width, dimensions.height)
+            .setColor(RED)
+            .draw()
+            .makeFixture()
+            .setZIndex(0)
+            .create()
+        .create();
+}
+
 void MapShapeBuilder::makeDeathZone(const pugi::xml_node &node) {
+    Dimensions dimensions(node);
+
+    auto entity = BodyBuilder(registry_, physics_)
+        .setPos(dimensions.x, dimensions.y)
+        .setType(b2_staticBody)
+            .addRect(dimensions.width, dimensions.height)
+            .setSensor()
+            .makeFixture()
+            .setColor(sf::Color(200, 100, 100, 100))
+            .setZIndex(3)
+            .draw()
+            .create()
+        .create();
+
+    registry_.emplace<DeathZone>(entity);
+}
+
+void MapShapeBuilder::makeCheckpoint(const pugi::xml_node &node) {
     Dimensions dimensions(node);
 
     auto entity = BodyBuilder(registry_, physics_)
@@ -145,9 +170,16 @@ void MapShapeBuilder::makeDeathZone(const pugi::xml_node &node) {
         .addRect(dimensions.width, dimensions.height)
             .setSensor()
             .makeFixture()
+            .setColor(sf::Color(100, 200, 100, 100))
             .setZIndex(3)
+            .draw()
             .create()
         .create();
 
-    registry_.emplace<DeathZone>(entity);
+    auto respawnLoc = sf::Vector2f(dimensions.x, (dimensions.y - dimensions.height / 2.f) + 2.3f);
+   // auto respawnLoc = sf::Vector2f(dimensions.x, dimensions.y);
+
+    registry_.emplace<Checkpoint>(entity, respawnLoc);
 }
+
+

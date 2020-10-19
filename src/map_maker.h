@@ -8,6 +8,7 @@
 #include <entt/entity/registry.hpp>
 #include "physics.h"
 #include "pugixml.hpp"
+#include "body_builder.h"
 
 
 struct Dimensions {
@@ -34,6 +35,8 @@ public:
     void makeRect(const pugi::xml_node& node);
 
     void makeDeathZone(const pugi::xml_node &node);
+
+    void makeCheckpoint(const pugi::xml_node &node);
 };
 
 /**

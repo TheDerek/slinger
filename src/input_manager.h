@@ -13,6 +13,7 @@
 #include <variant>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include "misc_components.h"
+#include "events.h"
 
 enum class InputAction {
     WALK_RIGHT,

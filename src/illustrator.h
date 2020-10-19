@@ -9,6 +9,7 @@
 #include <entt/entity/registry.hpp>
 #include <entt/signal/dispatcher.hpp>
 #include "misc_components.h"
+#include "events.h"
 
 //TODO: Replace with container struct that has the
 // shape and the Z index which we will use to sort

@@ -11,7 +11,9 @@
 
 #include <box2d/box2d.h>
 #include <SFML/Graphics/Shape.hpp>
+
 #include "misc_components.h"
+#include "events.h"
 
 struct BodyDeleter {
     void operator()(b2Body *body) const;
@@ -82,37 +84,29 @@ private:
     entt::dispatcher &dispatcher_;
 
 public:
-    explicit Physics(entt::registry &, entt::dispatcher &);
-
     static const float TIME_STEP;
     static constexpr float PI = 3.14159265358979f;
 
+    explicit Physics(entt::registry &, entt::dispatcher &);
+
     static b2Vec2 tob2(const sf::Vector2f &vec);
-
     static float toRadians(float deg);
-
     static float toDegrees(float rad);
-
     b2World &getWorld();
-
     void handlePhysics(entt::registry &registry, float delta, const sf::Vector2f &mousePos);
-
     BodyPtr makeBody(sf::Vector2f pos, float rot = 0, b2BodyType = b2_dynamicBody);
-
     BodyPtr &makeBody(entt::entity entity, sf::Vector2f pos, float rot = 0, b2BodyType = b2_dynamicBody);
-
     FixtureInfoPtr& makeFixture(entt::entity, sf::Shape*, entt::registry&, entt::entity body);
 
 private:
     void manageMovement(entt::entity entity, b2Body &body, Movement &movement);
-
     void rotateToPoint(b2Body &body, const sf::Vector2f &mousePos);
-
-    void fireRope(Event<FireRope> event);
-
-    void jump(Event<Jump> event);
-
     bool isOnFloor(entt::entity entity);
+
+    // Event handlers
+    void fireRope(Event<FireRope> event);
+    void jump(Event<Jump> event);
+    void teleport(Event<Teleport> event);
 };
 
 #endif //SLINGER_PHYSICS_H
