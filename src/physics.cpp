@@ -242,7 +242,6 @@ void Physics::fireRope(Event<FireRope> event) {
     dir = b2Vec2(dir.x * scale, dir.y * scale);
     endingPos = startingPos + dir;
 
-    // TODO Figure out why this doesn't segfault when c goes out of scope
     RopeHitCallback c(registry_, event.entity, world_, event.eventDef.localFireLoc);
     world_.RayCast(&c, startingPos, endingPos);
 }
