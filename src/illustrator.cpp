@@ -102,7 +102,6 @@ sf::Vector2f Illustrator::absolute(const sf::Vector2f &vec) {
 }
 
 void Illustrator::addRope(const Event<FireRope> &event) {
-    std::cout << "Drawing rope" << std::endl;
 }
 
 void Illustrator::onPlayerDeath(const Event<Death> &event) {

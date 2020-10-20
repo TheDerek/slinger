@@ -1,13 +1,16 @@
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
 
 #include <iostream>
-#include <spdlog/spdlog.h>
+#include <regex>
 
-#include "pugixml.hpp"
+#include <spdlog/spdlog.h>
+#include <pugixml.hpp>
 
 #include "map_maker.h"
 #include "body_builder.h"
 #include "input_manager.h"
+
+const std::regex PathBuilder::PATH_REGEX = std::regex(R"(\s?([^\d])(?:\s(-?\d+\.?\d+)(?:,(-?\d+\.?\d+))?)?)");
 
 Dimensions::Dimensions(const pugi::xml_node &node) {
     width = node.attribute("width").as_float();
@@ -32,10 +35,16 @@ void MapMaker::make(const std::string& path)
         throw std::runtime_error("could not find file: " + path);
     }
 
-    auto walls = doc.select_nodes("/svg/g[@inkscape:label='walls']/rect");
-    SPDLOG_DEBUG("Added {} walls from {}", walls.size(), path);
-    for (const auto& wall: walls) {
+    auto rectWalls = doc.select_nodes("/svg/g[@inkscape:label='walls']/rect");
+    SPDLOG_DEBUG("Added {} rectWalls from {}", rectWalls.size(), path);
+    for (const auto& wall: rectWalls) {
         mapShapeBuilder_.makeRect(wall.node());
+    }
+
+    auto polyWalls = doc.select_nodes("/svg/g[@inkscape:label='walls']/path");
+    SPDLOG_DEBUG("Added {} polyWalls from {}", polyWalls.size(), path);
+    for (const auto& wall: polyWalls) {
+        mapShapeBuilder_.makePolygon(wall.node());
     }
 
     auto deathZones = doc.select_nodes("/svg/g[@inkscape:label='death_zones']/rect");
@@ -148,6 +157,13 @@ void MapShapeBuilder::makeRect(const pugi::xml_node& node) {
         .create();
 }
 
+void MapShapeBuilder::makePolygon(const pugi::xml_node &node) {
+    auto svgPoints = node.attribute("d").as_string();
+    auto points = PathBuilder::build(svgPoints);
+
+    SPDLOG_INFO("Would make a polygon with the following points: {}", svgPoints);
+}
+
 void MapShapeBuilder::makeDeathZone(const pugi::xml_node &node) {
     Dimensions dimensions(node);
 
@@ -187,4 +203,56 @@ void MapShapeBuilder::makeCheckpoint(const pugi::xml_node &node) {
     registry_.emplace<Checkpoint>(entity, respawnLoc);
 }
 
+PathBuilder::CommandList PathBuilder::getCommands(const std::string &svgPath) {
+    auto list = PathBuilder::CommandList();
 
+    std::string searchString = svgPath;
+    auto matchResults = std::smatch{};
+    while(std::regex_search(searchString, matchResults, PathBuilder::PATH_REGEX))
+    {
+        if (matchResults.size() < 4) {
+            throw std::runtime_error("SVG path string malformed, not enough arguments");
+        }
+
+        auto command = PathBuilder::Command(matchResults[1].str()[0]);
+
+        // Default is no arguments
+        Arguments args = std::monostate {};
+
+        // Override the empty args if there are arguments
+        if (matchResults[3].matched) {
+            // There are two arguments, a vector
+            args = sf::Vector2f(std::stof(matchResults[2]), std::stof(matchResults[3]));
+        } else if (matchResults[2].matched) {
+            // A single argument
+            args = std::stof(matchResults[2]);
+        }
+
+        list.emplace_back(std::make_pair(command, args));
+
+        // Remove the captured string from the path and try again
+        searchString = matchResults.suffix();
+    }
+
+    return list;
+}
+
+template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
+
+PointList PathBuilder::getPoints(const PathBuilder::CommandList &commands) {
+    auto list = PointList();
+
+    for (const auto& [command, arguments] : commands) {
+        if (std::holds_alternative<std::monostate>(arguments)) {
+
+        }
+    }
+
+    return list;
+}
+
+PointList PathBuilder::build(const std::string &string) {
+    auto commands = getCommands(string);
+
+    return getPoints(commands);
+}

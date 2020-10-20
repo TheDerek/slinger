@@ -7,13 +7,13 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   id="SVGRoot"
-   version="1.1"
-   viewBox="0 0 632.14929 700.00002"
-   height="700"
-   width="632.14929"
+   sodipodi:docname="002-fall.svg"
    inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
-   sodipodi:docname="002-fall.svg">
+   width="632.14929"
+   height="700"
+   viewBox="0 0 632.14929 700.00002"
+   version="1.1"
+   id="SVGRoot">
   <defs
      id="defs833" />
   <sodipodi:namedview
@@ -24,11 +24,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="8"
-     inkscape:cx="115.23964"
-     inkscape:cy="97.8992"
+     inkscape:zoom="22.627417"
+     inkscape:cx="58.545297"
+     inkscape:cy="28.007353"
      inkscape:document-units="px"
-     inkscape:current-layer="layer2"
+     inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
      showgrid="false"
      inkscape:window-width="2560"
@@ -55,7 +55,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -140,25 +140,25 @@
        y="98.787209"
        x="39.445488"
        height="1.4088367"
-       width="20.956245"
+       width="24.956245"
        id="rect1429-3-7-3-6-2"
-       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.126825;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.138401;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <rect
        ry="0"
        y="117.11311"
-       x="68.493896"
+       x="70.693901"
        height="1.4805505"
-       width="4.2383308"
+       width="2.0383301"
        id="rect1429-3-7-3-6-2-9"
-       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0584693;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0405478;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <rect
        ry="0"
        y="100.19604"
        x="25.060165"
        height="17.66081"
-       width="33.455162"
+       width="36.855164"
        id="rect1429-3-7-6"
-       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.567354;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.595486;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <rect
        ry="0"
        y="99.505219"
@@ -215,6 +215,11 @@
        width="10.739313"
        id="rect1429-3-7-5-22"
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.134675;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <path
+       id="rect1429-3-3-36"
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.118711;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 57.093168,11.416765 v 5.132543 h -5.0399 z"
+       sodipodi:nodetypes="cccc" />
   </g>
   <g
      inkscape:groupmode="layer"
@@ -270,7 +275,7 @@
     <rect
        style="opacity:1;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
        id="rect1433-6-5-5-6-1-9-5-5-1-7"
-       width="20.956245"
+       width="24.956245"
        height="0.4664081"
        x="39.445488"
        y="98.320801"
@@ -278,9 +283,9 @@
     <rect
        style="opacity:1;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
        id="rect1433-6-5-5-6-1-9-5-5-1-7-0"
-       width="4.2383308"
+       width="2.0383301"
        height="0.4664081"
-       x="68.493896"
+       x="70.693901"
        y="116.6467"
        ry="0" />
     <rect
@@ -333,8 +338,8 @@
        id="player"
        width="1"
        height="2"
-       x="52.659477"
-       y="23.155766"
+       x="55.98288"
+       y="23.461966"
        ry="0" />
   </g>
 </svg>

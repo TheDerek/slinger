@@ -46,10 +46,10 @@ private:
     std::optional<AttachPrototype> attachPrototype_;
 
 public:
-
     explicit BodyBuilder(entt::registry &registry, Physics &physics);
     BodyBuilder& addShape(ShapePrototype);
     ShapeBuilder addRect(float width, float height);
+    ShapeBuilder addPolygon(const std::vector<sf::Vector2f>& points);
     BodyBuilder &setPos(float x, float y);
     BodyBuilder &setType(b2BodyType type);
     BodyBuilder &setRot(float rot);

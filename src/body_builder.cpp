@@ -77,6 +77,19 @@ ShapeBuilder BodyBuilder::addRect(float width, float height) {
     return ShapeBuilder(this, std::make_unique<sf::RectangleShape>(sf::RectangleShape((sf::Vector2(width, height)))));
 }
 
+ShapeBuilder BodyBuilder::addPolygon(const std::vector<sf::Vector2f>& points) {
+    auto shape = std::make_unique<sf::ConvexShape>();
+
+    shape->setPointCount(points.size());
+    for (std::size_t i = 0; i != points.size(); ++i) {
+        shape->setPoint(i, points[i]);
+    }
+
+
+    return ShapeBuilder(this, std::move(shape));
+}
+
+
 BodyBuilder &BodyBuilder::setPos(float x, float y) {
     pos_ = sf::Vector2(x, y);
     return *this;
@@ -162,3 +175,4 @@ BodyBuilder &BodyBuilder::attach(entt::entity body,
 
     return *this;
 }
+

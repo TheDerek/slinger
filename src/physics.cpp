@@ -253,7 +253,6 @@ void Physics::jump(Event<Jump> event) {
 
     BodyPtr &body = registry_.get<BodyPtr>(event.entity);
 
-    std::cout << "Gonna jump!" << std::endl;
     float impulse = body->GetMass() * event.eventDef.impulse;
     body->ApplyLinearImpulseToCenter(b2Vec2(0, impulse), false);
 }

@@ -6,9 +6,17 @@
 #define SLINGER_MAP_MAKER_H
 
 #include <entt/entity/registry.hpp>
+#include <variant>
+#include <regex>
+
 #include "physics.h"
 #include "pugixml.hpp"
 #include "body_builder.h"
+
+
+namespace {
+    using PointList = std::vector<sf::Vector2f>;
+}
 
 
 struct Dimensions {
@@ -18,6 +26,27 @@ struct Dimensions {
     float height;
 
     Dimensions(const pugi::xml_node &node);
+};
+
+
+class PathBuilder {
+    enum class Command: char {
+        MoveTo = 'M',
+        LineTo = 'L',
+        HorizontalLineTo = 'H',
+        VerticalLineTo = 'V',
+        ClosePath = 'Z'
+    };
+
+    using Arguments = std::variant<float, sf::Vector2f, std::monostate>;
+    using CommandList = std::vector<std::pair<Command, Arguments>>;
+    const static std::regex PATH_REGEX;
+
+    static CommandList getCommands(const std::string& svgPath);
+    static PointList getPoints(const CommandList& list);
+
+public:
+    static PointList build(const std::string& string);
 };
 
 
@@ -35,8 +64,9 @@ public:
     void makeRect(const pugi::xml_node& node);
 
     void makeDeathZone(const pugi::xml_node &node);
-
     void makeCheckpoint(const pugi::xml_node &node);
+
+    void makePolygon(const pugi::xml_node &node);
 };
 
 /**
