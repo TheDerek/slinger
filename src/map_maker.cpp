@@ -10,7 +10,7 @@
 #include "body_builder.h"
 #include "input_manager.h"
 
-const std::regex PathBuilder::PATH_REGEX = std::regex(R"(\s?([^\d])(?:\s(-?\d+\.?\d+)(?:,(\d+\.?\d*))?)?)");
+const std::regex PathBuilder::PATH_REGEX = std::regex(R"(\s?([^\d])(?:\s(-?\d+\.?\d+)(?:,(-?\d+\.?\d*))?)?)");
 
 namespace {
     sf::Color RED = sf::Color(255, 100, 50);
