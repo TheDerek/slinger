@@ -65,12 +65,15 @@ public:
     MapShapeBuilder(entt::registry& registry, Physics& physics);
 
     void makePlayer(const pugi::xml_node &node);
-    void makeRect(const pugi::xml_node& node);
+    void makeWall(const pugi::xml_node& node);
 
-    void makeDeathZone(const pugi::xml_node &node);
+    entt::entity makeDeathZone(const pugi::xml_node &node);
     void makeCheckpoint(const pugi::xml_node &node);
 
-    void makePolygon(const pugi::xml_node &node);
+private:
+    entt::entity makeRect(const pugi::xml_node& node);
+    entt::entity makePolygon(const pugi::xml_node &node);
+
 };
 
 /**

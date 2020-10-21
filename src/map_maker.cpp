@@ -39,19 +39,13 @@ void MapMaker::make(const std::string& path)
         throw std::runtime_error("could not find file: " + path);
     }
 
-    auto rectWalls = doc.select_nodes("/svg/g[@inkscape:label='walls']/rect");
-    SPDLOG_DEBUG("Added {} rectWalls from {}", rectWalls.size(), path);
-    for (const auto& wall: rectWalls) {
-        mapShapeBuilder_.makeRect(wall.node());
+    auto walls = doc.select_nodes("/svg/g[@inkscape:label='walls']/*");
+    for (const auto& wall: walls) {
+        mapShapeBuilder_.makeWall(wall.node());
     }
+    SPDLOG_DEBUG("Added {} walls from {}", walls.size(), path);
 
-    auto polyWalls = doc.select_nodes("/svg/g[@inkscape:label='walls']/path");
-    SPDLOG_DEBUG("Added {} polyWalls from {}", polyWalls.size(), path);
-    for (const auto& wall: polyWalls) {
-        mapShapeBuilder_.makePolygon(wall.node());
-    }
-
-    auto deathZones = doc.select_nodes("/svg/g[@inkscape:label='death_zones']/rect");
+    auto deathZones = doc.select_nodes("/svg/g[@inkscape:label='death_zones']/*");
     SPDLOG_DEBUG("Added {} death zones from {}", deathZones.size(), path);
     for (const auto& zone: deathZones) {
         mapShapeBuilder_.makeDeathZone(zone.node());
@@ -72,6 +66,18 @@ void MapMaker::make(const std::string& path)
 
     SPDLOG_INFO("Successfully loaded {} as the current level", path);
 }
+
+void MapShapeBuilder::makeWall(const pugi::xml_node &node) {
+    if (strcmp(node.name(), "rect") == 0) {
+        makeRect(node);
+    }
+    else if (strcmp(node.name(), "path") == 0) {
+        makePolygon(node);
+    } else {
+        throw std::runtime_error("Unsupported element type for wall");
+    }
+}
+
 
 MapShapeBuilder::MapShapeBuilder(entt::registry &registry, Physics &physics):
     registry_(registry),
@@ -145,10 +151,11 @@ void MapShapeBuilder::makePlayer(const pugi::xml_node &node) {
     });
 }
 
-void MapShapeBuilder::makeRect(const pugi::xml_node& node) {
+
+entt::entity MapShapeBuilder::makeRect(const pugi::xml_node& node) {
     Dimensions dimensions(node);
 
-    BodyBuilder(registry_, physics_)
+    return BodyBuilder(registry_, physics_)
         .setPos(dimensions.x, dimensions.y)
         .setType(b2_staticBody)
         .addRect(dimensions.width, dimensions.height)
@@ -160,13 +167,13 @@ void MapShapeBuilder::makeRect(const pugi::xml_node& node) {
         .create();
 }
 
-void MapShapeBuilder::makePolygon(const pugi::xml_node &node) {
+entt::entity MapShapeBuilder::makePolygon(const pugi::xml_node &node) {
     auto svgPoints = node.attribute("d").as_string();
     auto points = PathBuilder::build(svgPoints);
 
     SPDLOG_INFO("Would make a polygon with the following points: {}", svgPoints);
 
-    BodyBuilder(registry_, physics_)
+    return BodyBuilder(registry_, physics_)
         .setPos(0, 0)
         .setType(b2_staticBody)
         .addPolygon(points)
@@ -178,26 +185,48 @@ void MapShapeBuilder::makePolygon(const pugi::xml_node &node) {
         .create();
 }
 
-void MapShapeBuilder::makeDeathZone(const pugi::xml_node &node) {
-    Dimensions dimensions(node);
+entt::entity MapShapeBuilder::makeDeathZone(const pugi::xml_node &node) {
+    entt::entity entity;
 
-    auto entity = BodyBuilder(registry_, physics_)
-        .setPos(dimensions.x, dimensions.y)
-        .setType(b2_staticBody)
-            .addRect(dimensions.width, dimensions.height)
-            .setSensor()
-            .makeFixture()
-//            .setColor(sf::Color(200, 100, 100, 100))
-//            .setZIndex(3)
-//            .draw()
-            .create()
-        .create();
+    if (strcmp(node.name(), "rect") == 0) {
+        Dimensions dimensions(node);
+        entity = BodyBuilder(registry_, physics_)
+            .setPos(dimensions.x, dimensions.y)
+            .setType(b2_staticBody)
+                .addRect(dimensions.width, dimensions.height)
+                .setSensor()
+                .makeFixture()
+                .create()
+            .create();
+
+    } else if (strcmp(node.name(), "path") == 0) {
+        auto svgPoints = node.attribute("d").as_string();
+        auto points = PathBuilder::build(svgPoints);
+
+        entity = BodyBuilder(registry_, physics_)
+            .setPos(0, 0)
+            .setType(b2_staticBody)
+            .addPolygon(points)
+                .setColor(RED)
+                .setZIndex(5)
+                .makeFixture()
+                .setSensor()
+                .create()
+            .create();
+    } else {
+        throw std::runtime_error("Unsupported element type for death zone");
+    }
 
     registry_.emplace<DeathZone>(entity);
+    return entity;
 }
 
 void MapShapeBuilder::makeCheckpoint(const pugi::xml_node &node) {
     Dimensions dimensions(node);
+
+    if (strcmp(node.name(), "rect") != 0) {
+        throw std::runtime_error("Unsupported element type for checkpoint");
+    }
 
     auto entity = BodyBuilder(registry_, physics_)
         .setPos(dimensions.x, dimensions.y)
@@ -205,14 +234,11 @@ void MapShapeBuilder::makeCheckpoint(const pugi::xml_node &node) {
         .addRect(dimensions.width, dimensions.height)
             .setSensor()
             .makeFixture()
-//            .setColor(sf::Color(100, 200, 100, 100))
-//            .setZIndex(3)
-//            .draw()
             .create()
         .create();
 
+    // Respawn at the bottom of the checkpoint with a small jump for the player
     auto respawnLoc = sf::Vector2f(dimensions.x, (dimensions.y - dimensions.height / 2.f) + 2.3f);
-   // auto respawnLoc = sf::Vector2f(dimensions.x, dimensions.y);
 
     registry_.emplace<Checkpoint>(entity, respawnLoc);
 }

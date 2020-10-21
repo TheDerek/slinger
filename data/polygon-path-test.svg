@@ -25,8 +25,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="16"
-     inkscape:cx="22.116364"
-     inkscape:cy="6.4064995"
+     inkscape:cx="12.666359"
+     inkscape:cy="4.4064805"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
@@ -73,9 +73,9 @@
        id="rect1429-3-6"
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.119705;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <path
-       id="rect1429-3-3-36"
-       style="fill:#000000;fill-opacity:1;stroke-width:1.04007"
-       d="M 28.479442,-2.1095029 V 7.3136849 L 14.241602,7.3641739 18.034719,4.840282 Z"
+       id="rect1429-3-3-36-3-6"
+       style="display:inline;opacity:1;fill:#000000;fill-opacity:1;stroke-width:1.04007"
+       d="M 25.381417,-4.5618395 V 4.861348 l -14.23784,0.05049 4.493114,-7.023892 z"
        sodipodi:nodetypes="ccccc" />
   </g>
   <g
@@ -87,7 +87,13 @@
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="death_zones"
-     style="opacity:0.5" />
+     style="opacity:0.5">
+    <path
+       id="rect1429-3-3-36-3"
+       style="display:inline;fill:#000000;fill-opacity:1;stroke-width:1.04007"
+       d="M 7.8189171,-2.1743385 V 7.248849 l -14.23784,0.05049 3.793117,-2.523892 z"
+       sodipodi:nodetypes="ccccc" />
+  </g>
   <g
      inkscape:groupmode="layer"
      id="layer3"
