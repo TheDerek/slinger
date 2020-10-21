@@ -10,7 +10,11 @@
 #include "body_builder.h"
 #include "input_manager.h"
 
-const std::regex PathBuilder::PATH_REGEX = std::regex(R"(\s?([^\d])(?:\s(-?\d+\.?\d+)(?:,(-?\d+\.?\d+))?)?)");
+const std::regex PathBuilder::PATH_REGEX = std::regex(R"(\s?([^\d])(?:\s(-?\d+\.?\d+)(?:,(\d+\.?\d*))?)?)");
+
+namespace {
+    sf::Color RED = sf::Color(255, 100, 50);
+}
 
 Dimensions::Dimensions(const pugi::xml_node &node) {
     width = node.attribute("width").as_float();
@@ -142,7 +146,6 @@ void MapShapeBuilder::makePlayer(const pugi::xml_node &node) {
 }
 
 void MapShapeBuilder::makeRect(const pugi::xml_node& node) {
-    sf::Color RED = sf::Color(255, 100, 50);
     Dimensions dimensions(node);
 
     BodyBuilder(registry_, physics_)
@@ -162,6 +165,17 @@ void MapShapeBuilder::makePolygon(const pugi::xml_node &node) {
     auto points = PathBuilder::build(svgPoints);
 
     SPDLOG_INFO("Would make a polygon with the following points: {}", svgPoints);
+
+    BodyBuilder(registry_, physics_)
+        .setPos(0, 0)
+        .setType(b2_staticBody)
+        .addPolygon(points)
+            .setColor(RED)
+            .draw()
+            .setZIndex(5)
+            .makeFixture()
+            .create()
+        .create();
 }
 
 void MapShapeBuilder::makeDeathZone(const pugi::xml_node &node) {
@@ -214,7 +228,7 @@ PathBuilder::CommandList PathBuilder::getCommands(const std::string &svgPath) {
             throw std::runtime_error("SVG path string malformed, not enough arguments");
         }
 
-        auto command = PathBuilder::Command(matchResults[1].str()[0]);
+        auto command = static_cast<PathBuilder::Command>(matchResults[1].str()[0]);
 
         // Default is no arguments
         Arguments args = std::monostate {};
@@ -242,10 +256,88 @@ template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
 PointList PathBuilder::getPoints(const PathBuilder::CommandList &commands) {
     auto list = PointList();
 
-    for (const auto& [command, arguments] : commands) {
-        if (std::holds_alternative<std::monostate>(arguments)) {
+    size_t index = 0;
+    for (const auto& commandPair : commands) {
+        Command command = commandPair.first;
+        Arguments arguments = commandPair.second;
 
+        if (command == Command::MoveTo || command == Command::RelativeMoveTo) {
+            if (!std::holds_alternative<sf::Vector2f>(arguments)) {
+                throw std::runtime_error("Unsupported arguments");
+            }
+
+            auto point = std::get<sf::Vector2f>(arguments);
+            point.y *= -1.f;
+            list.emplace_back(point);
         }
+
+        if (command == Command::LineTo) {
+            if (!std::holds_alternative<sf::Vector2f>(arguments)) {
+                throw std::runtime_error("Unsupported arguments");
+            }
+
+            auto point = std::get<sf::Vector2f>(arguments);
+            point.y *= -1.f;
+            //point = list.at(index - 1) + point;
+            list.emplace_back(point);
+        }
+
+        if (command == Command::RelativeLineTo) {
+            if (!std::holds_alternative<sf::Vector2f>(arguments)) {
+                throw std::runtime_error("Unsupported arguments");
+            }
+
+            auto point = std::get<sf::Vector2f>(arguments);
+            point.y *= -1.f;
+            point = list.at(index - 1) + point;
+            list.emplace_back(point);
+        }
+
+        if (command == Command::HorizontalLineTo) {
+            if (!std::holds_alternative<float>(arguments)) {
+                throw std::runtime_error("Unsupported arguments");
+            }
+
+            auto point = sf::Vector2f(std::get<float>(arguments), list.at(index - 1).y);
+            list.emplace_back(point);
+        }
+
+        if (command == Command::RelativeHorizontalLineTo) {
+            if (!std::holds_alternative<float>(arguments)) {
+                throw std::runtime_error("Unsupported arguments");
+            }
+
+            auto point = list.at(index - 1) + sf::Vector2f(std::get<float>(arguments), 0);
+            list.emplace_back(point);
+        }
+
+        if (command == Command::VerticalLineTo) {
+            if (!std::holds_alternative<float>(arguments)) {
+                throw std::runtime_error("Unsupported arguments");
+            }
+
+            auto point = sf::Vector2f(list.at(index - 1).x, -std::get<float>(arguments));
+            list.emplace_back(point);
+        }
+
+        if (command == Command::RelativeVerticalLineTo) {
+            if (!std::holds_alternative<float>(arguments)) {
+                throw std::runtime_error("Unsupported arguments");
+            }
+
+            auto point = list.at(index - 1) + sf::Vector2f(0, -std::get<float>(arguments));
+            list.emplace_back(point);
+        }
+
+        if (command == Command::ClosePath) {
+            if (!std::holds_alternative<std::monostate>(arguments)) {
+                throw std::runtime_error("Unsupported arguments");
+            }
+
+            list.emplace_back(list.at(0));
+        }
+
+        index++;
     }
 
     return list;

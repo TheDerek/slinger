@@ -9,9 +9,9 @@
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    sodipodi:docname="polygon-path-test.svg"
    inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
-   width="632.14929"
-   height="700"
-   viewBox="0 0 632.14929 700.00002"
+   width="22.428143"
+   height="10.667425"
+   viewBox="0 0 22.428142 10.667425"
    version="1.1"
    id="SVGRoot">
   <defs
@@ -24,9 +24,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="22.627417"
-     inkscape:cx="59.611454"
-     inkscape:cy="21.108626"
+     inkscape:zoom="5.6568543"
+     inkscape:cx="-48.636512"
+     inkscape:cy="66.404673"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
@@ -46,7 +46,7 @@
      fit-margin-right="0"
      fit-margin-bottom="0"
      inkscape:snap-others="false"
-     showborder="false" />
+     showborder="true" />
   <metadata
      id="metadata836">
     <rdf:RDF>
@@ -55,27 +55,28 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <g
      inkscape:label="walls"
      inkscape:groupmode="layer"
-     id="layer1">
+     id="layer1"
+     style="display:inline">
     <rect
        ry="0"
-       y="25.790487"
-       x="43.479462"
-       height="21.678841"
+       y="9.3904896"
+       x="0.27946094"
+       height="1.1727413"
        width="22.428143"
        id="rect1429-3-6"
-       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.514669;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.119705;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <path
        id="rect1429-3-3-36"
-       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.118711;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 65.861293,17.073619 v 5.132543 h -5.0399 z"
-       sodipodi:nodetypes="cccc" />
+       style="fill:#000000;fill-opacity:1;stroke-width:5.82672"
+       d="M 0.27946094,9.3904896 V 62.181315 L -79.484135,62.464164 -58.234233,48.324752 Z"
+       sodipodi:nodetypes="ccccc" />
   </g>
   <g
      inkscape:groupmode="layer"
@@ -96,8 +97,8 @@
        id="player"
        width="1"
        height="2"
-       x="53.43729"
-       y="23.74481"
+       x="10.237289"
+       y="7.3448124"
        ry="0" />
   </g>
 </svg>

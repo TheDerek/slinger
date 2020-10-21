@@ -32,9 +32,13 @@ struct Dimensions {
 class PathBuilder {
     enum class Command: char {
         MoveTo = 'M',
+        RelativeMoveTo = 'm',
         LineTo = 'L',
         HorizontalLineTo = 'H',
         VerticalLineTo = 'V',
+        RelativeLineTo = 'l',
+        RelativeHorizontalLineTo = 'h',
+        RelativeVerticalLineTo = 'v',
         ClosePath = 'Z'
     };
 

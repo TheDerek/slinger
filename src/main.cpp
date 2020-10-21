@@ -20,7 +20,13 @@ int main() {
 
     SPDLOG_INFO("Starting game");
 
-    sf::RenderWindow window(sf::VideoMode(1000, 800), "Slinger DEV build");
+    auto settings = sf::ContextSettings();
+    settings.antialiasingLevel = 8;
+    sf::RenderWindow window(
+        sf::VideoMode(1000, 800),
+        "Slinger DEV build"
+    );
+
     window.setKeyRepeatEnabled(false);
 
     entt::registry registry;
@@ -32,7 +38,7 @@ int main() {
     MapMaker mapMaker(registry, physics);
     CheckpointManager checkpointManager(registry, dispatcher);
 
-    mapMaker.make("data/polygon-path-test.svg");
+    mapMaker.make("data/002-fall.svg");
 
     sf::Clock deltaClock;
     UIAction action;

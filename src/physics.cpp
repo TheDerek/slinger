@@ -114,9 +114,10 @@ FixtureInfoPtr &Physics::makeFixture(
 
     auto *rect = dynamic_cast<sf::RectangleShape *>(shape);
     auto *circle = dynamic_cast<sf::CircleShape *>(shape);
+    auto *polygon = dynamic_cast<sf::ConvexShape *>(shape);
 
-    if (!(rect || circle)) {
-        throw std::runtime_error("Can only make components from a rectangle and circle so far");
+    if (!(rect || circle || polygon)) {
+        throw std::runtime_error("Unsupported shape type");
     }
 
     std::unique_ptr<b2Shape> fixtureShape;
@@ -145,6 +146,17 @@ FixtureInfoPtr &Physics::makeFixture(
 
         fixtureShape = std::make_unique<b2CircleShape>(circleShape);
         shape->setOrigin(sf::Vector2f(circle->getRadius(), circle->getRadius()));
+    }
+
+    if (polygon) {
+        b2Vec2 vertices[polygon->getPointCount()];
+        for (size_t i = 0; i < polygon->getPointCount(); i++) {
+            vertices[i].Set(polygon->getPoint(i).x, polygon->getPoint(i).y);
+        }
+
+        b2PolygonShape polygonShape;
+        polygonShape.Set(vertices, polygon->getPointCount());
+        fixtureShape = std::make_unique<b2PolygonShape>(polygonShape);
     }
 
     b2FixtureDef fixtureDef;
