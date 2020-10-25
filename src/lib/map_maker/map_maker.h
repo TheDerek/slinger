@@ -35,6 +35,7 @@ public:
 
     void makePlayer(const pugi::xml_node &node);
     void makeWall(const pugi::xml_node& node);
+    void makeDecoration(const pugi::xml_node& node);
 
     entt::entity makeDeathZone(const pugi::xml_node &node);
     void makeCheckpoint(const pugi::xml_node &node);
@@ -43,6 +44,11 @@ private:
     entt::entity makeRect(const pugi::xml_node& node);
     entt::entity makePolygon(const pugi::xml_node &node);
 
+    static const int BASE_Z_INDEX;
+    static const int PLAYER_BODY_Z_INDEX;
+    static const int PLAYER_ARM_Z_INDEX;
+    static const int WALL_Z_INDEX;
+    static const int DECORATION_Z_INDEX;
 };
 
 /**

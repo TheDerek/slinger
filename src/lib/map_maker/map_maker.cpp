@@ -13,7 +13,14 @@
 
 namespace {
     sf::Color RED = sf::Color(255, 100, 50);
+    sf::Color GREY = sf::Color(100, 100, 100);
 }
+
+const int MapShapeBuilder::BASE_Z_INDEX = 0;
+const int MapShapeBuilder::WALL_Z_INDEX = 0;
+const int MapShapeBuilder::DECORATION_Z_INDEX = 1;
+const int MapShapeBuilder::PLAYER_BODY_Z_INDEX = 2;
+const int MapShapeBuilder::PLAYER_ARM_Z_INDEX = 3;
 
 Dimensions::Dimensions(const pugi::xml_node &node) {
     width = node.attribute("width").as_float();
@@ -56,6 +63,11 @@ void MapMaker::make(const std::string& path)
         mapShapeBuilder_.makeCheckpoint(zone.node());
     }
 
+    auto decorations = doc.select_nodes("/svg/g[@inkscape:label='decorations']/*");
+    for (const auto& decoration: decorations) {
+        mapShapeBuilder_.makeDecoration(decoration.node());
+    }
+
     auto playerNode = doc.select_node("/svg/g[@inkscape:label='objects']/rect[@id='player']");
     if (!playerNode) {
         throw std::runtime_error("Could not find player in svg " + path);
@@ -96,7 +108,7 @@ void MapShapeBuilder::makePlayer(const pugi::xml_node &node) {
             .setColor(sf::Color(100, 200, 50))
             .makeFixture()
             .draw()
-            .setZIndex(0)
+            .setZIndex(MapShapeBuilder::PLAYER_BODY_Z_INDEX)
             .create()
         .addRect(0.8f, 0.1f)
             .setPos(0, -1)
@@ -104,8 +116,6 @@ void MapShapeBuilder::makePlayer(const pugi::xml_node &node) {
             .setColor(sf::Color(255, 255, 255))
             .makeFixture()
             .setFootSensor()
-            .draw()
-            .setZIndex(1)
             .create()
         .create();
 
@@ -130,7 +140,7 @@ void MapShapeBuilder::makePlayer(const pugi::xml_node &node) {
             .setSensor()
             .makeFixture()
             .draw()
-            .setZIndex(1)
+            .setZIndex(PLAYER_ARM_Z_INDEX)
             .setDensity(0)
             .setPos(0, 0.4f)
             .create()
@@ -161,7 +171,7 @@ entt::entity MapShapeBuilder::makeRect(const pugi::xml_node& node) {
             .setColor(RED)
             .draw()
             .makeFixture()
-            .setZIndex(0)
+            .setZIndex(WALL_Z_INDEX)
             .create()
         .create();
 }
@@ -170,15 +180,13 @@ entt::entity MapShapeBuilder::makePolygon(const pugi::xml_node &node) {
     auto svgPoints = node.attribute("d").as_string();
     auto points = PathBuilder::build(svgPoints);
 
-    SPDLOG_INFO("Would make a polygon with the following points: {}", svgPoints);
-
     return BodyBuilder(registry_, physics_)
         .setPos(0, 0)
         .setType(b2_staticBody)
         .addPolygon(points)
             .setColor(RED)
             .draw()
-            .setZIndex(5)
+            .setZIndex(WALL_Z_INDEX)
             .makeFixture()
             .create()
         .create();
@@ -207,7 +215,6 @@ entt::entity MapShapeBuilder::makeDeathZone(const pugi::xml_node &node) {
             .setType(b2_staticBody)
             .addPolygon(points)
                 .setColor(RED)
-                .setZIndex(5)
                 .makeFixture()
                 .setSensor()
                 .create()
@@ -240,6 +247,21 @@ void MapShapeBuilder::makeCheckpoint(const pugi::xml_node &node) {
     auto respawnLoc = sf::Vector2f(dimensions.x, (dimensions.y - dimensions.height / 2.f) + 2.3f);
 
     registry_.emplace<Checkpoint>(entity, respawnLoc);
+}
+
+void MapShapeBuilder::makeDecoration(const pugi::xml_node &node) {
+    auto svgPoints = node.attribute("d").as_string();
+    auto points = PathBuilder::build(svgPoints);
+
+    BodyBuilder(registry_, physics_)
+        .setPos(0, 0)
+        .setType(b2_staticBody)
+            .addPolygon(points)
+            .setColor(GREY)
+            .setZIndex(DECORATION_Z_INDEX)
+            .draw()
+            .create()
+        .create();
 }
 
 

@@ -46,6 +46,7 @@ class PathBuilder {
 
     static CommandList getCommands(const std::string& svgPath);
     static PointList getPoints(const CommandList& list);
+    static bool isPointList(Command command, const std::string &arguments);
 
 public:
     const static Regexer COMMAND_REGEX;

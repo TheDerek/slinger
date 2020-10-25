@@ -24,9 +24,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="5.6568543"
-     inkscape:cx="544.08746"
-     inkscape:cy="186.45231"
+     inkscape:zoom="8"
+     inkscape:cx="121.49129"
+     inkscape:cy="58.719817"
      inkscape:document-units="px"
      inkscape:current-layer="layer3"
      inkscape:document-rotation="0"
@@ -167,7 +167,7 @@
     <path
        id="rect1429-3-7-6-1-9-2"
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.170462;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 118.45901,88.318927 h 13.16887 l -6.08112,28.750763 h -1.85516 z"
+       d="m 118.45901,92.118926 13.16887,-3.799999 -6.08112,28.750763 h -1.85516 z"
        sodipodi:nodetypes="ccccc" />
     <rect
        ry="0"
@@ -567,8 +567,8 @@
        id="player"
        width="1"
        height="2"
-       x="588.30103"
-       y="196.18738"
+       x="50.023884"
+       y="23.461966"
        ry="0" />
   </g>
 </svg>

@@ -2,6 +2,7 @@
 // Created by derek on 22/10/20.
 //
 
+#include <set>
 #include "path_builder.h"
 
 const Regexer PathBuilder::COMMAND_REGEX = Regexer(R"(\s?([a-df-zA-Z])(?:\s([^a-df-zA-Z]+))?)");
@@ -10,6 +11,7 @@ const Regexer PathBuilder::COORDINATE_REGEX = Regexer(R"((-?\d+\.?\d*(?:e-?\d+)?
 PathBuilder::CommandList PathBuilder::getCommands(const std::string &svgPath) {
     auto list = PathBuilder::CommandList();
 
+    // Iterate over every command: argument pair in the SVG path
     for (const auto& commandStr : COMMAND_REGEX.search(svgPath)) {
         if (commandStr.groups().size() != 2) {
             throw std::runtime_error("Could not parse svg path: " + svgPath);
@@ -32,7 +34,7 @@ PathBuilder::CommandList PathBuilder::getCommands(const std::string &svgPath) {
             const auto& numbers = COORDINATE_REGEX.search(numbersStr);
 
             // String contains a list of coordinates
-            if (numbersStr.find(',') != std::string::npos) {
+            if (PathBuilder::isPointList(command, numbersStr)) {
                 PointList list;
                 std::optional<float> lastCoord;
                 for (const auto& x : numbers) {
@@ -173,4 +175,22 @@ PointList PathBuilder::build(const std::string &string) {
     auto commands = getCommands(string);
 
     return getPoints(commands);
+}
+
+bool PathBuilder::isPointList(Command command, const std::string &arguments) {
+    const static std::set<Command> pointsListCommands = {
+        Command::MoveTo,
+        Command::RelativeMoveTo,
+        Command::LineTo,
+        Command::RelativeLineTo
+    };
+
+    // For certain commands the comma is optional so we need to hard code a check for
+    // those commands
+    if (pointsListCommands.contains(command)) {
+        return true;
+    }
+
+    // Otherwise just check to see if the string has a comma, this is probably not needed
+    return arguments.find(',') != std::string::npos;
 }
