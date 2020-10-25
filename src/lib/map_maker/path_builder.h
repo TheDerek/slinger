@@ -43,13 +43,14 @@ class PathBuilder {
 
     using Arguments = std::variant<std::monostate, std::vector<float>, std::vector<sf::Vector2f>>;
     using CommandList = std::vector<std::pair<Command, Arguments>>;
-    const static Regexer COMMAND_REGEX;
-    const static Regexer COORDINATE_REGEX;
 
     static CommandList getCommands(const std::string& svgPath);
     static PointList getPoints(const CommandList& list);
 
 public:
+    const static Regexer COMMAND_REGEX;
+    const static Regexer COORDINATE_REGEX;
+
     static PointList build(const std::string& string);
 };
 

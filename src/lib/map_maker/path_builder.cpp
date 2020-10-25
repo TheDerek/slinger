@@ -4,8 +4,8 @@
 
 #include "path_builder.h"
 
-const Regexer PathBuilder::COMMAND_REGEX = Regexer(R"(\s?([a-zA-Z])(?:\s([^a-zA-Z]+))?)");
-const Regexer PathBuilder::COORDINATE_REGEX = Regexer(R"((-?\d+\.?\d*))");
+const Regexer PathBuilder::COMMAND_REGEX = Regexer(R"(\s?([a-df-zA-Z])(?:\s([^a-df-zA-Z]+))?)");
+const Regexer PathBuilder::COORDINATE_REGEX = Regexer(R"((-?\d+\.?\d*(?:e-?\d+)?))");
 
 PathBuilder::CommandList PathBuilder::getCommands(const std::string &svgPath) {
     auto list = PathBuilder::CommandList();
