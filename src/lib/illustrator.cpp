@@ -43,7 +43,7 @@ void Illustrator::onAddDrawable(entt::registry& registry, entt::entity entity) {
 
 
 void Illustrator::draw(entt::registry &registry) {
-    window_.clear(sf::Color::Black);
+    window_.clear(sf::Color(100, 100, 100));
     window_.setFramerateLimit(60);
 
     registry.view<Follow, Position>().each(

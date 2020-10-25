@@ -11,7 +11,7 @@
 #include "input_manager.h"
 #include "path_builder.h"
 
-const sf::Color MapShapeBuilder::WALL_COLOUR = sf::Color(255, 100, 50);
+const sf::Color MapShapeBuilder::WALL_COLOUR = sf::Color(50, 50, 50); // sf::Color(255, 100, 50);
 const sf::Color MapShapeBuilder::DECORATION_COLOUR = sf::Color(200, 200, 200);
 
 
@@ -104,7 +104,7 @@ void MapShapeBuilder::makePlayer(const pugi::xml_node &node) {
         .setPos(dimensions.x, dimensions.y)
         .setFixedRotation(true)
         .addRect(1, 2)
-        .setColor(sf::Color(100, 200, 50))
+        .setColor(sf::Color(235, 186, 52))
         .makeFixture()
         .draw()
         .setZIndex(MapShapeBuilder::PLAYER_BODY_Z_INDEX)
@@ -136,7 +136,7 @@ void MapShapeBuilder::makePlayer(const pugi::xml_node &node) {
     auto arm = BodyBuilder(registry_, physics_)
         .setPos(dimensions.x, dimensions.y)
         .addRect(0.3f, 1)
-        .setColor(sf::Color(255, 255, 255))
+        .setColor(sf::Color(235, 186, 52))
         .setSensor()
         .makeFixture()
         .draw()
