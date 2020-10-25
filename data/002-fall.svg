@@ -24,9 +24,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="8"
-     inkscape:cx="88.459157"
-     inkscape:cy="62.538962"
+     inkscape:zoom="11.313708"
+     inkscape:cx="176.87922"
+     inkscape:cy="125.46534"
      inkscape:document-units="px"
      inkscape:current-layer="layer6"
      inkscape:document-rotation="0"
@@ -644,6 +644,11 @@
        id="rect478-2-3-7-9-2-2-8-6-1-9"
        style="display:inline;opacity:1;fill:#646464;fill-opacity:1;stroke-width:0;paint-order:fill markers stroke;stop-color:#000000"
        d="m 652.9459,288.39932 0.67158,-1.91554 -0.84075,0.36106 -0.58912,-1.3722 -0.84075,0.36106 0.58911,1.37217 -0.84073,0.36105 z"
+       sodipodi:nodetypes="cccccccc" />
+    <path
+       id="rect478-6"
+       style="display:inline;opacity:0.5;fill:#000000;stroke-width:0;paint-order:fill markers stroke;stop-color:#000000"
+       d="m 131.89389,129.82764 1.77863,-1.95308 -1.19074,0.005 -0.008,-1.94335 -1.19075,0.005 0.008,1.94334 -1.19074,0.005 z"
        sodipodi:nodetypes="cccccccc" />
   </g>
 </svg>

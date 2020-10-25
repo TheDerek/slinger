@@ -72,8 +72,8 @@ public:
 
     [[nodiscard]] const std::string& formatTime() {
         if (hasStarted()) {
-            float seconds = clock_.getElapsedTime().asSeconds();
             int minutes = clock_.getElapsedTime().asSeconds() / 60;
+            float seconds = clock_.getElapsedTime().asSeconds() - (float)(minutes * 60);
 
             std::snprintf(&display_[0], display_.size() + 1, "%02d:%04.1f", minutes, seconds);
         } else {
