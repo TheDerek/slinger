@@ -24,7 +24,7 @@ struct Dimensions {
 
 
 /**
- * Builds Box2d bodies from svg shapes
+ * Builds Box2d bodies and sfml shapes from svg shapes
  */
 class MapShapeBuilder {
     entt::registry& registry_;
@@ -49,6 +49,9 @@ private:
     static const int PLAYER_ARM_Z_INDEX;
     static const int WALL_Z_INDEX;
     static const int DECORATION_Z_INDEX;
+
+    static const sf::Color WALL_COLOUR;
+    static const sf::Color DECORATION_COLOUR;
 };
 
 /**

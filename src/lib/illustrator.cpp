@@ -81,22 +81,6 @@ void Illustrator::draw(entt::registry &registry) {
     window_.setView(camera_);
 }
 
-float Illustrator::round(float number, float multiple) {
-    return ((number + multiple / 2) / multiple) * multiple;
-}
-
-Drawable Illustrator::makeRectangle(const sf::Vector2f &size, const sf::Vector2f &pos) const {
-    Drawable d{std::make_unique<sf::RectangleShape>(sf::RectangleShape(size))};
-    d.value->setPosition(pos);
-    return d;
-}
-
-Drawable Illustrator::makeCircle(float radius, const sf::Vector2f &pos) const {
-    Drawable d{std::make_unique<sf::CircleShape>(sf::CircleShape(radius))};
-    d.value->setPosition(pos);
-    return d;
-}
-
 sf::Vector2f Illustrator::absolute(const sf::Vector2f &vec) {
     return sf::Vector2f(abs(vec.x), abs(vec.y));
 }

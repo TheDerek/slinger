@@ -11,10 +11,9 @@
 #include "input_manager.h"
 #include "path_builder.h"
 
-namespace {
-    sf::Color WALL_COLOUR = sf::Color(255, 100, 50);
-    sf::Color DECORATION_COLOUR = sf::Color(200, 200, 200);
-}
+const sf::Color MapShapeBuilder::WALL_COLOUR = sf::Color(255, 100, 50);
+const sf::Color MapShapeBuilder::DECORATION_COLOUR = sf::Color(200, 200, 200);
+
 
 const int MapShapeBuilder::BASE_Z_INDEX = 0;
 const int MapShapeBuilder::WALL_Z_INDEX = 0;
