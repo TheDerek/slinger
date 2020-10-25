@@ -68,10 +68,10 @@ void Illustrator::draw(entt::registry &registry) {
     );
 
     window_.setView(window_.getDefaultView());
-    registry.view<Follow, Position>().each(
-        [this](const auto entity, const Follow& follow, const Position& position) {
-            text_.setString("(" + std::to_string(position.value.x) + ", " + std::to_string(position.value.y) + ")");
-            text_.setPosition(0, 0);
+    registry.view<Follow, Timeable>().each(
+        [this](const auto entity, const Follow& follow, Timeable& timeable) {
+            text_.setString(timeable.formatTime());
+            text_.setPosition(10, 10);
             text_.setScale(1.f, 1.f);
             window_.draw(text_);
         }

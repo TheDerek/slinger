@@ -12,8 +12,8 @@
 #include "path_builder.h"
 
 namespace {
-    sf::Color RED = sf::Color(255, 100, 50);
-    sf::Color GREY = sf::Color(100, 100, 100);
+    sf::Color WALL_COLOUR = sf::Color(255, 100, 50);
+    sf::Color DECORATION_COLOUR = sf::Color(200, 200, 200);
 }
 
 const int MapShapeBuilder::BASE_Z_INDEX = 0;
@@ -119,9 +119,10 @@ void MapShapeBuilder::makePlayer(const pugi::xml_node &node) {
             .create()
         .create();
 
-    // Follow the player and enable checkpoints
+    // Follow the player, enable checkpoints and add a timer
     registry_.emplace<Follow>(player);
     registry_.emplace<Respawnable>(player, sf::Vector2f(dimensions.x, dimensions.y), sf::seconds(2));
+    registry_.emplace<Timeable>(player);
 
     // Add movement to player
     registry_.emplace<Movement>(player);
@@ -168,7 +169,7 @@ entt::entity MapShapeBuilder::makeRect(const pugi::xml_node& node) {
         .setPos(dimensions.x, dimensions.y)
         .setType(b2_staticBody)
         .addRect(dimensions.width, dimensions.height)
-            .setColor(RED)
+            .setColor(WALL_COLOUR)
             .draw()
             .makeFixture()
             .setZIndex(WALL_Z_INDEX)
@@ -184,7 +185,7 @@ entt::entity MapShapeBuilder::makePolygon(const pugi::xml_node &node) {
         .setPos(0, 0)
         .setType(b2_staticBody)
         .addPolygon(points)
-            .setColor(RED)
+            .setColor(WALL_COLOUR)
             .draw()
             .setZIndex(WALL_Z_INDEX)
             .makeFixture()
@@ -214,7 +215,7 @@ entt::entity MapShapeBuilder::makeDeathZone(const pugi::xml_node &node) {
             .setPos(0, 0)
             .setType(b2_staticBody)
             .addPolygon(points)
-                .setColor(RED)
+                .setColor(WALL_COLOUR)
                 .makeFixture()
                 .setSensor()
                 .create()
@@ -250,18 +251,35 @@ void MapShapeBuilder::makeCheckpoint(const pugi::xml_node &node) {
 }
 
 void MapShapeBuilder::makeDecoration(const pugi::xml_node &node) {
-    auto svgPoints = node.attribute("d").as_string();
-    auto points = PathBuilder::build(svgPoints);
+    if (strcmp(node.name(), "rect") == 0) {
+        Dimensions dimensions(node);
+        BodyBuilder(registry_, physics_)
+            .setPos(dimensions.x, dimensions.y)
+            .setType(b2_staticBody)
+            .addRect(dimensions.width, dimensions.height)
+                .setPos(dimensions.x - dimensions.width /2.f, dimensions.y - dimensions.height/2.f)
+                .setColor(DECORATION_COLOUR)
+                .setZIndex(DECORATION_Z_INDEX)
+                .draw()
+                .create()
+            .create();
 
-    BodyBuilder(registry_, physics_)
-        .setPos(0, 0)
-        .setType(b2_staticBody)
+    } else if (strcmp(node.name(), "path") == 0) {
+        auto svgPoints = node.attribute("d").as_string();
+        auto points = PathBuilder::build(svgPoints);
+
+        BodyBuilder(registry_, physics_)
+            .setPos(0, 0)
+            .setType(b2_staticBody)
             .addPolygon(points)
-            .setColor(GREY)
-            .setZIndex(DECORATION_Z_INDEX)
-            .draw()
-            .create()
-        .create();
+                .setColor(DECORATION_COLOUR)
+                .setZIndex(DECORATION_Z_INDEX)
+                .draw()
+                .create()
+            .create();
+    } else {
+        throw std::runtime_error("Unsupported element type for death zone");
+    }
 }
 
 

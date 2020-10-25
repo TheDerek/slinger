@@ -30,6 +30,10 @@ void CheckpointManager::onCheckpoint(const EnteredCheckpoint &event) {
         return;
     }
 
+    if (Timeable* timeable = registry_.try_get<Timeable>(event.entity)) {
+        timeable->startIfNotStarted();
+    }
+
     respawnable->lastCheckpointLoc = event.eventDef.zone.respawnLoc;
     SPDLOG_INFO("Entity {} reached new checkpoint at ({}, {})", event.entity, respawnable->lastCheckpointLoc.x, respawnable->lastCheckpointLoc.y);
 

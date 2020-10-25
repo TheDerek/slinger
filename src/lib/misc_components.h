@@ -7,6 +7,7 @@
 
 #include <set>
 #include <SFML/System/Time.hpp>
+#include <SFML/System/Clock.hpp>
 
 struct Movement {
     float speed = 10;
@@ -47,6 +48,39 @@ struct Respawnable {
 
     inline explicit Respawnable(sf::Vector2f lastCheckpointLoc, sf::Time respawnTime):
         lastCheckpointLoc(lastCheckpointLoc), respawnTime(respawnTime) {};
+};
+
+class Timeable {
+    sf::Clock clock_;
+    bool clockStarted_ = false;
+    std::string display_;
+
+public:
+    inline explicit Timeable(): display_(8, '\0') {};
+
+    [[nodiscard]] inline bool hasStarted() const {
+        return clockStarted_;
+    }
+    void startIfNotStarted() {
+        if (clockStarted_) {
+            return;
+        }
+
+        clockStarted_ = true;
+        clock_.restart();
+    }
+
+    [[nodiscard]] const std::string& formatTime() {
+        if (true) {
+            float seconds = clock_.getElapsedTime().asSeconds();
+            int minutes = clock_.getElapsedTime().asSeconds() / 60;
+
+            std::snprintf(&display_[0], display_.size(), "%02d:%04.1f", minutes, seconds);
+        } else {
+            display_ = "00:00.00";
+        }
+        return display_;
+    }
 };
 
 struct Attachments {
