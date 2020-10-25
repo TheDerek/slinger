@@ -6,66 +6,100 @@
 
 #include <utility>
 
-ShapeBuilder::ShapeBuilder(BodyBuilder *bodyBuilder, std::unique_ptr<sf::Shape> shape):
-    bodyBuilder_(bodyBuilder)
-{
-    prototype.shape = std::move(shape);
-}
 
 ShapeBuilder &ShapeBuilder::setPos(float x, float y) {
-    prototype.shape->setPosition(x, y);
+    prototype_.shape->setPosition(x, y);
     return *this;
 }
 
 ShapeBuilder &ShapeBuilder::setRot(float x) {
-    prototype.shape->setRotation(x);
+    prototype_.shape->setRotation(x);
     return *this;
 }
 
 ShapeBuilder &ShapeBuilder::draw() {
-    prototype.draw = true;
+    prototype_.draw = true;
     return *this;
 }
 
 ShapeBuilder &ShapeBuilder::makeFixture() {
-    prototype.makeFixture = true;
+    prototype_.makeFixture = true;
     return *this;
 }
 
 ShapeBuilder &ShapeBuilder::setDensity(float density) {
-    prototype.density = density;
+    prototype_.density = density;
     return *this;
 }
 
 ShapeBuilder &ShapeBuilder::setFriction(float friction) {
-    prototype.friction = friction;
+    prototype_.friction = friction;
     return *this;
 }
 
-BodyBuilder &ShapeBuilder::create() {
-    return bodyBuilder_->addShape(std::move(prototype));
+BodyBuilder &ShapeBuilder::attachToBody() {
+    return bodyBuilder_->addShape(std::move(prototype_));
 }
 
 ShapeBuilder &ShapeBuilder::setSensor() {
-    prototype.sensor = true;
+    prototype_.sensor = true;
     return *this;
 }
 
 ShapeBuilder &ShapeBuilder::setColor(sf::Color color) {
-    prototype.shape->setFillColor(color);
+    prototype_.shape->setFillColor(color);
     return *this;
 }
 
 ShapeBuilder &ShapeBuilder::setFootSensor() {
-    prototype.footSensor = true;
+    prototype_.footSensor = true;
     return *this;
 }
 
 ShapeBuilder &ShapeBuilder::setZIndex(int z) {
-    prototype.zIndex = z;
+    prototype_.zIndex = z;
 
     return *this;
 }
+
+ShapeBuilder::ShapeBuilder(std::unique_ptr<sf::Shape> shape) {
+    prototype_.shape = std::move(shape);
+}
+
+entt::entity ShapeBuilder::create(entt::registry &registry, std::optional<entt::entity> entity) {
+    if (!entity) {
+        entity = registry.create();
+    }
+
+    registry.emplace<Drawable>(
+        entity.value(),
+        Drawable { std::move(prototype_.shape), prototype_.zIndex }
+    );
+
+    return entity.value();
+}
+
+void ShapeBuilder::setBodyBuilder(BodyBuilder *bodyBuilder) {
+    bodyBuilder_ = bodyBuilder;
+}
+
+ShapeBuilder ShapeBuilder::CreateRect(float width, float height) {
+    auto rect = std::make_unique<sf::RectangleShape>(sf::RectangleShape((sf::Vector2(width, height))));
+
+    return ShapeBuilder(std::move(rect));
+}
+
+ShapeBuilder ShapeBuilder::CreatePolygon(const std::vector<sf::Vector2f>& points) {
+    auto shape = std::make_unique<sf::ConvexShape>();
+
+    shape->setPointCount(points.size());
+    for (std::size_t i = 0; i != points.size(); ++i) {
+        shape->setPoint(i, points[i]);
+    }
+
+    return ShapeBuilder(std::move(shape));
+}
+
 
 BodyBuilder::BodyBuilder(entt::registry &registry, Physics &physics) :
     registry_(registry),
@@ -74,19 +108,17 @@ BodyBuilder::BodyBuilder(entt::registry &registry, Physics &physics) :
 }
 
 ShapeBuilder BodyBuilder::addRect(float width, float height) {
-    return ShapeBuilder(this, std::make_unique<sf::RectangleShape>(sf::RectangleShape((sf::Vector2(width, height)))));
+    auto builder = ShapeBuilder::CreateRect(width, height);
+    builder.setBodyBuilder(this);
+
+    return builder;
 }
 
 ShapeBuilder BodyBuilder::addPolygon(const std::vector<sf::Vector2f>& points) {
-    auto shape = std::make_unique<sf::ConvexShape>();
+    auto builder = ShapeBuilder::CreatePolygon(points);
+    builder.setBodyBuilder(this);
 
-    shape->setPointCount(points.size());
-    for (std::size_t i = 0; i != points.size(); ++i) {
-        shape->setPoint(i, points[i]);
-    }
-
-
-    return ShapeBuilder(this, std::move(shape));
+    return builder;
 }
 
 

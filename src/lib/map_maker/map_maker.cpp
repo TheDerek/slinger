@@ -105,18 +105,18 @@ void MapShapeBuilder::makePlayer(const pugi::xml_node &node) {
         .setPos(dimensions.x, dimensions.y)
         .setFixedRotation(true)
         .addRect(1, 2)
-            .setColor(sf::Color(100, 200, 50))
-            .makeFixture()
-            .draw()
-            .setZIndex(MapShapeBuilder::PLAYER_BODY_Z_INDEX)
-            .create()
+        .setColor(sf::Color(100, 200, 50))
+        .makeFixture()
+        .draw()
+        .setZIndex(MapShapeBuilder::PLAYER_BODY_Z_INDEX)
+        .attachToBody()
         .addRect(0.8f, 0.1f)
-            .setPos(0, -1)
-            .setSensor()
-            .setColor(sf::Color(255, 255, 255))
-            .makeFixture()
-            .setFootSensor()
-            .create()
+        .setPos(0, -1)
+        .setSensor()
+        .setColor(sf::Color(255, 255, 255))
+        .makeFixture()
+        .setFootSensor()
+        .attachToBody()
         .create();
 
     // Follow the player, enable checkpoints and add a timer
@@ -137,14 +137,14 @@ void MapShapeBuilder::makePlayer(const pugi::xml_node &node) {
     auto arm = BodyBuilder(registry_, physics_)
         .setPos(dimensions.x, dimensions.y)
         .addRect(0.3f, 1)
-            .setColor(sf::Color(255, 255, 255))
-            .setSensor()
-            .makeFixture()
-            .draw()
-            .setZIndex(PLAYER_ARM_Z_INDEX)
-            .setDensity(0)
-            .setPos(0, 0.4f)
-            .create()
+        .setColor(sf::Color(255, 255, 255))
+        .setSensor()
+        .makeFixture()
+        .draw()
+        .setZIndex(PLAYER_ARM_Z_INDEX)
+        .setDensity(0)
+        .setPos(0, 0.4f)
+        .attachToBody()
         .attach(player, 0, 0.7f, 0, 0)
         .setFixedRotation(true)
         .create();
@@ -169,11 +169,11 @@ entt::entity MapShapeBuilder::makeRect(const pugi::xml_node& node) {
         .setPos(dimensions.x, dimensions.y)
         .setType(b2_staticBody)
         .addRect(dimensions.width, dimensions.height)
-            .setColor(WALL_COLOUR)
-            .draw()
-            .makeFixture()
-            .setZIndex(WALL_Z_INDEX)
-            .create()
+        .setColor(WALL_COLOUR)
+        .draw()
+        .makeFixture()
+        .setZIndex(WALL_Z_INDEX)
+        .attachToBody()
         .create();
 }
 
@@ -185,11 +185,11 @@ entt::entity MapShapeBuilder::makePolygon(const pugi::xml_node &node) {
         .setPos(0, 0)
         .setType(b2_staticBody)
         .addPolygon(points)
-            .setColor(WALL_COLOUR)
-            .draw()
-            .setZIndex(WALL_Z_INDEX)
-            .makeFixture()
-            .create()
+        .setColor(WALL_COLOUR)
+        .draw()
+        .setZIndex(WALL_Z_INDEX)
+        .makeFixture()
+        .attachToBody()
         .create();
 }
 
@@ -201,10 +201,10 @@ entt::entity MapShapeBuilder::makeDeathZone(const pugi::xml_node &node) {
         entity = BodyBuilder(registry_, physics_)
             .setPos(dimensions.x, dimensions.y)
             .setType(b2_staticBody)
-                .addRect(dimensions.width, dimensions.height)
-                .setSensor()
-                .makeFixture()
-                .create()
+            .addRect(dimensions.width, dimensions.height)
+            .setSensor()
+            .makeFixture()
+            .attachToBody()
             .create();
 
     } else if (strcmp(node.name(), "path") == 0) {
@@ -215,10 +215,10 @@ entt::entity MapShapeBuilder::makeDeathZone(const pugi::xml_node &node) {
             .setPos(0, 0)
             .setType(b2_staticBody)
             .addPolygon(points)
-                .setColor(WALL_COLOUR)
-                .makeFixture()
-                .setSensor()
-                .create()
+            .setColor(WALL_COLOUR)
+            .makeFixture()
+            .setSensor()
+            .attachToBody()
             .create();
     } else {
         throw std::runtime_error("Unsupported element type for death zone");
@@ -239,9 +239,9 @@ void MapShapeBuilder::makeCheckpoint(const pugi::xml_node &node) {
         .setPos(dimensions.x, dimensions.y)
         .setType(b2_staticBody)
         .addRect(dimensions.width, dimensions.height)
-            .setSensor()
-            .makeFixture()
-            .create()
+        .setSensor()
+        .makeFixture()
+        .attachToBody()
         .create();
 
     // Respawn at the bottom of the checkpoint with a small jump for the player
@@ -253,30 +253,20 @@ void MapShapeBuilder::makeCheckpoint(const pugi::xml_node &node) {
 void MapShapeBuilder::makeDecoration(const pugi::xml_node &node) {
     if (strcmp(node.name(), "rect") == 0) {
         Dimensions dimensions(node);
-        BodyBuilder(registry_, physics_)
-            .setPos(dimensions.x, dimensions.y)
-            .setType(b2_staticBody)
-            .addRect(dimensions.width, dimensions.height)
-                .setPos(dimensions.x - dimensions.width /2.f, dimensions.y - dimensions.height/2.f)
-                .setColor(DECORATION_COLOUR)
-                .setZIndex(DECORATION_Z_INDEX)
-                .draw()
-                .create()
-            .create();
+        ShapeBuilder::CreateRect(dimensions.width, dimensions.height)
+            .setPos(dimensions.x - dimensions.width / 2.f, dimensions.y - dimensions.height / 2.f)
+            .setColor(DECORATION_COLOUR)
+            .setZIndex(DECORATION_Z_INDEX)
+            .create(registry_);
 
     } else if (strcmp(node.name(), "path") == 0) {
         auto svgPoints = node.attribute("d").as_string();
         auto points = PathBuilder::build(svgPoints);
 
-        BodyBuilder(registry_, physics_)
-            .setPos(0, 0)
-            .setType(b2_staticBody)
-            .addPolygon(points)
-                .setColor(DECORATION_COLOUR)
-                .setZIndex(DECORATION_Z_INDEX)
-                .draw()
-                .create()
-            .create();
+        ShapeBuilder::CreatePolygon(points)
+            .setColor(DECORATION_COLOUR)
+            .setZIndex(DECORATION_Z_INDEX)
+            .create(registry_);
     } else {
         throw std::runtime_error("Unsupported element type for death zone");
     }

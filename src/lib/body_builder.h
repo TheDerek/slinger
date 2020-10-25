@@ -61,12 +61,14 @@ public:
 class ShapeBuilder {
 private:
     BodyBuilder* bodyBuilder_;
+    ShapePrototype prototype_;
 
 public:
-    ShapePrototype prototype;
 
-    ShapeBuilder(BodyBuilder* bodyBuilder, std::unique_ptr<sf::Shape> shape);
+    static ShapeBuilder CreateRect(float width, float height);
+    static ShapeBuilder CreatePolygon(const std::vector<sf::Vector2f>& points);
 
+    void setBodyBuilder(BodyBuilder *bodyBuilder);
     ShapeBuilder& setPos(float x, float y);
     ShapeBuilder& setRot(float x);
     ShapeBuilder& draw();
@@ -77,7 +79,18 @@ public:
     ShapeBuilder& setColor(sf::Color color);
     ShapeBuilder& setFootSensor();
     ShapeBuilder& setZIndex(int z);
-    BodyBuilder& create();
+
+    /**
+     * Attach the built shape to the body. This is undefined if this builder was not created with a
+     * BodyBuilder pointer.
+     * @return
+     */
+    BodyBuilder& attachToBody();
+
+    entt::entity create(entt::registry& registry, std::optional<entt::entity> entity = std::optional<entt::entity>());
+
+private:
+    ShapeBuilder(std::unique_ptr<sf::Shape> shape);
 };
 
 
