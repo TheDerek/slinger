@@ -38,7 +38,7 @@ int main() {
     MapMaker mapMaker(registry, physics);
     CheckpointManager checkpointManager(registry, dispatcher);
 
-    mapMaker.make("data/arrow-test.svg");
+    mapMaker.make("data/002-fall.svg");
 
     sf::Clock deltaClock;
     UIAction action;
