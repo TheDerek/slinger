@@ -56,7 +56,7 @@ class Timeable {
     std::string display_;
 
 public:
-    inline explicit Timeable(): display_(8, '\0') {};
+    inline explicit Timeable(): display_(7, '\0') {};
 
     [[nodiscard]] inline bool hasStarted() const {
         return clockStarted_;
@@ -71,13 +71,13 @@ public:
     }
 
     [[nodiscard]] const std::string& formatTime() {
-        if (true) {
+        if (hasStarted()) {
             float seconds = clock_.getElapsedTime().asSeconds();
             int minutes = clock_.getElapsedTime().asSeconds() / 60;
 
-            std::snprintf(&display_[0], display_.size(), "%02d:%04.1f", minutes, seconds);
+            std::snprintf(&display_[0], display_.size() + 1, "%02d:%04.1f", minutes, seconds);
         } else {
-            display_ = "00:00.00";
+            display_ = "00:00.0";
         }
         return display_;
     }
