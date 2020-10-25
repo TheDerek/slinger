@@ -235,10 +235,25 @@ void Physics::rotateToPoint(b2Body &body, const sf::Vector2f &mousePos) {
 }
 
 void Physics::fireRope(Event<FireRope> event) {
+    // Let go of the rope if we are already holding it
     if (auto* rope = registry_.try_get<HoldingRope>(event.entity)) {
         registry_.destroy(rope->rope);
         registry_.remove<HoldingRope>(event.entity);
         return;
+    }
+
+    // If the body or anything attached to the body is dead don't fire the rope
+    if (Respawnable *respawnable = registry_.try_get<Respawnable>(event.entity)) {
+        if (respawnable->dead) {
+            return;
+        }
+    }
+    for (const auto attachedEntity : registry_.get_or_emplace<Attachments>(event.entity).entities) {
+        if (Respawnable *respawnable = registry_.try_get<Respawnable>(attachedEntity)) {
+            if (respawnable->dead) {
+                return;
+            }
+        }
     }
 
     const auto &body = registry_.get<BodyPtr>(event.entity);
