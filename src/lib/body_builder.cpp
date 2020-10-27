@@ -22,6 +22,11 @@ ShapeBuilder &ShapeBuilder::draw() {
     return *this;
 }
 
+ShapeBuilder &ShapeBuilder::draw(bool shouldDraw) {
+    prototype_.draw = shouldDraw;
+    return *this;
+}
+
 ShapeBuilder &ShapeBuilder::makeFixture() {
     prototype_.makeFixture = true;
     return *this;
@@ -103,6 +108,22 @@ ShapeBuilder ShapeBuilder::CreatePolygon(const std::vector<sf::Vector2f>& points
 ShapeBuilder &ShapeBuilder::setOutline(float thickness, sf::Color color) {
     prototype_.shape->setOutlineThickness(thickness);
     prototype_.shape->setOutlineColor(color);
+
+    return *this;
+}
+
+ShapeBuilder &ShapeBuilder::setTexture(sf::Texture *texture) {
+    prototype_.shape->setTexture(texture);
+    //rect->setTextureRect(sf::IntRect(0, 0, width * 60, 50));
+
+
+    prototype_.shape->setScale(1, -1);
+
+    return *this;
+}
+
+ShapeBuilder &ShapeBuilder::setTextureRect(sf::IntRect bounds) {
+    prototype_.shape->setTextureRect(bounds);
 
     return *this;
 }

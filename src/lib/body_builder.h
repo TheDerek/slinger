@@ -79,6 +79,9 @@ public:
     ShapeBuilder& setColor(sf::Color color);
     ShapeBuilder& setFootSensor();
     ShapeBuilder& setZIndex(int z);
+    ShapeBuilder& setTexture(sf::Texture *texture);
+    ShapeBuilder& setTextureRect(sf::IntRect bounds);
+
     ShapeBuilder& setOutline(float thickness, sf::Color color = sf::Color::Black);
 
     /**
@@ -90,8 +93,11 @@ public:
 
     entt::entity create(entt::registry& registry, std::optional<entt::entity> entity = std::optional<entt::entity>());
 
+    ShapeBuilder &draw(bool shouldDraw);
+
 private:
     ShapeBuilder(std::unique_ptr<sf::Shape> shape);
+
 };
 
 

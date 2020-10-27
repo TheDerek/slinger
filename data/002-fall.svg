@@ -24,11 +24,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="3.9999998"
-     inkscape:cx="425.20903"
-     inkscape:cy="251.65593"
+     inkscape:zoom="15.999999"
+     inkscape:cx="65.062338"
+     inkscape:cy="32.486494"
      inkscape:document-units="px"
-     inkscape:current-layer="layer6"
+     inkscape:current-layer="layer4"
      inkscape:document-rotation="0"
      showgrid="false"
      inkscape:window-width="2560"
@@ -419,14 +419,13 @@
      inkscape:groupmode="layer"
      id="layer4"
      inkscape:label="checkpoints"
-     style="opacity:0.5"
-     sodipodi:insensitive="true">
+     style="opacity:0.5">
     <rect
-       style="opacity:1;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:0.0844747;stroke-opacity:1"
+       style="opacity:1;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:0.102855;stroke-opacity:1"
        id="rect1438-1-0-9"
-       width="1.8256248"
+       width="2.7064934"
        height="6.4135499"
-       x="49.978207"
+       x="51.803833"
        y="19.094093"
        ry="0" />
     <rect
@@ -466,7 +465,8 @@
        height="0.4664081"
        x="58.58622"
        y="49.197117"
-       ry="0" />
+       ry="0"
+       inkscape:label="spikes" />
     <rect
        style="opacity:1;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
        id="rect1433-6-5-5-6-1-9-5-5-1"
@@ -474,7 +474,8 @@
        height="0.4664081"
        x="39.445488"
        y="64.745445"
-       ry="0" />
+       ry="0"
+       inkscape:label="spikes" />
     <rect
        style="opacity:1;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
        id="rect1433-6-5-5-6-1-9-5-5-1-2"
@@ -482,7 +483,8 @@
        height="0.4664081"
        x="56.516678"
        y="82.35376"
-       ry="0" />
+       ry="0"
+       inkscape:label="spikes" />
     <rect
        style="opacity:1;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
        id="rect1433-6-5-5-6-1-9-5-5-1-7"
@@ -490,7 +492,8 @@
        height="0.4664081"
        x="39.445488"
        y="98.320801"
-       ry="0" />
+       ry="0"
+       inkscape:label="spikes" />
     <path
        id="rect1429-3-7-5-2-3-3-1"
        style="fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:0.758603;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
@@ -540,7 +543,8 @@
        height="1.0125465"
        x="573.74719"
        y="272.09335"
-       ry="0" />
+       ry="0"
+       inkscape:label="spikes" />
     <rect
        style="opacity:1;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
        id="rect1243-1-2-3-1-0-9-2"
@@ -548,7 +552,8 @@
        height="1.0125465"
        x="599.8963"
        y="272.63779"
-       ry="0" />
+       ry="0"
+       inkscape:label="spikes" />
     <rect
        style="opacity:1;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
        id="rect1243-1-2-3-1-0-4"

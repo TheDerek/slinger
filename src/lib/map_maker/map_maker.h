@@ -29,6 +29,7 @@ struct Dimensions {
 class MapShapeBuilder {
     entt::registry& registry_;
     Physics& physics_;
+    sf::Texture spikeTexture_;
 
 public:
     MapShapeBuilder(entt::registry& registry, Physics& physics);

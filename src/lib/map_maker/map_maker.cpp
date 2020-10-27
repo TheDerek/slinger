@@ -92,7 +92,9 @@ MapShapeBuilder::MapShapeBuilder(entt::registry &registry, Physics &physics):
     registry_(registry),
     physics_(physics)
 {
-
+    spikeTexture_.loadFromFile("data/spike.png");
+    spikeTexture_.setRepeated(true);
+    spikeTexture_.setSmooth(true);
 }
 
 void MapShapeBuilder::makePlayer(const pugi::xml_node &node) {
@@ -195,13 +197,21 @@ entt::entity MapShapeBuilder::makePolygon(const pugi::xml_node &node) {
 entt::entity MapShapeBuilder::makeDeathZone(const pugi::xml_node &node) {
     entt::entity entity;
 
+    auto label = node.attribute("inkscape:label");
+    bool spikes = strcmp(label.value(), "spikes") == 0;
+
     if (strcmp(node.name(), "rect") == 0) {
         Dimensions dimensions(node);
+        int textureWidth = spikeTexture_.getSize().x * dimensions.width;
+
         entity = BodyBuilder(registry_, physics_)
             .setPos(dimensions.x, dimensions.y)
             .setType(b2_staticBody)
             .addRect(dimensions.width, dimensions.height)
                 .setSensor()
+                .draw(spikes)
+                .setTexture(&spikeTexture_)
+                .setTextureRect(sf::IntRect(1, 1, textureWidth, spikeTexture_.getSize().y))
                 .makeFixture()
                 .attachToBody()
             .create();
@@ -222,7 +232,7 @@ entt::entity MapShapeBuilder::makeDeathZone(const pugi::xml_node &node) {
         throw std::runtime_error("Unsupported element type for death zone");
     }
 
-    registry_.emplace<DeathZone>(entity);
+    registry_.emplace<DeathZone>(entity, DeathZone {spikes = spikes});
     return entity;
 }
 

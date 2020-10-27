@@ -31,7 +31,7 @@ struct HoldingRope {
 };
 
 struct DeathZone {
-    int x;
+    bool spikes = false;
 };
 
 struct Checkpoint {
