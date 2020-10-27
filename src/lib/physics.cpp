@@ -21,6 +21,8 @@ Physics::Physics(entt::registry &registry, entt::dispatcher &dispatcher) :
     dispatcher_.sink<Event<FireRope>>().connect<&Physics::fireRope>(*this);
     dispatcher_.sink<Event<Jump>>().connect<&Physics::jump>(*this);
     dispatcher_.sink<Event<Teleport>>().connect<&Physics::teleport>(*this);
+    dispatcher_.sink<Event<Death>>().connect<&Physics::onDeath>(*this);
+
 }
 
 const float Physics::TIME_STEP = 1 / 60.f;
@@ -322,7 +324,27 @@ void Physics::teleport(Event<Teleport> event) {
     // Translate the body itself
     body->SetAngularVelocity(0);
     body->SetLinearVelocity(b2Vec2_zero);
-    body->SetTransform(tob2(event.eventDef.newLoc), body->GetAngle());
+    body->SetTransform(tob2(event.eventDef.newLoc), 0);
+    body->SetFixedRotation(true);
+}
+
+void Physics::onDeath(Event<Death> event) {
+    // Remove any ropes the entity is holding on to
+    for (auto attachedEntity : registry_.get_or_emplace<Attachments>(event.entity).entities) {
+        if (auto *rope = registry_.try_get<HoldingRope>(attachedEntity)) {
+            registry_.destroy(rope->rope);
+            registry_.remove<HoldingRope>(attachedEntity);
+        }
+    }
+
+    if (auto* body = registry_.try_get<BodyPtr>(event.entity)) {
+        float direction = (*body)->GetLinearVelocity().x > 0.f ? -1.f :-1.f;
+
+        (*body)->SetFixedRotation(false);
+        //(*body)->SetLinearVelocity(b2Vec2(0, 0));
+        (*body)->ApplyAngularImpulse(10.f * direction, false);
+
+    }
 }
 
 

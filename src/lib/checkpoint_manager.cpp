@@ -65,13 +65,9 @@ void CheckpointManager::respawn(entt::entity entity, Respawnable &respawnable) {
 void CheckpointManager::despawn(entt::entity entity, Respawnable& respawnable) {
     registry_.remove_if_exists<Follow>(entity);
 
-    // Remove any ropes the entity is holding on to
-    for (auto attachedEntity : registry_.get_or_emplace<Attachments>(entity).entities) {
-        if (auto *rope = registry_.try_get<HoldingRope>(attachedEntity)) {
-            registry_.destroy(rope->rope);
-            registry_.remove<HoldingRope>(attachedEntity);
-        }
-    }
+    dispatcher_.enqueue(Event<Death>(entity, Death {}));
+
+
 
     respawnable.dead = true;
     respawnable.currentRespawnTime = respawnable.respawnTime;

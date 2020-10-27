@@ -107,6 +107,8 @@ private:
     void fireRope(Event<FireRope> event);
     void jump(Event<Jump> event);
     void teleport(Event<Teleport> event);
+    void onDeath(Event<Death> event);
+
 };
 
 #endif //SLINGER_PHYSICS_H
