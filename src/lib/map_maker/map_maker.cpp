@@ -255,7 +255,10 @@ void MapShapeBuilder::makeCheckpoint(const pugi::xml_node &node) {
     // Respawn at the bottom of the checkpoint with a small jump for the player
     auto respawnLoc = sf::Vector2f(dimensions.x, (dimensions.y - dimensions.height / 2.f) + 2.3f);
 
-    registry_.emplace<Checkpoint>(entity, respawnLoc);
+    auto label = node.attribute("inkscape:label");
+    bool finish = strcmp(label.value(), "finish") == 0;
+
+    registry_.emplace<Checkpoint>(entity, respawnLoc, finish);
 }
 
 void MapShapeBuilder::makeDecoration(const pugi::xml_node &node) {

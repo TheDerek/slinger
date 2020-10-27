@@ -30,6 +30,10 @@ void CheckpointManager::onCheckpoint(const EnteredCheckpoint &event) {
         return;
     }
 
+    if (respawnable->dead) {
+        return;
+    }
+
     if (Timeable* timeable = registry_.try_get<Timeable>(event.entity)) {
         timeable->startIfNotStarted();
     }
@@ -37,12 +41,18 @@ void CheckpointManager::onCheckpoint(const EnteredCheckpoint &event) {
     respawnable->lastCheckpointLoc = event.eventDef.zone.respawnLoc;
     SPDLOG_INFO("Entity {} reached new checkpoint at ({}, {})", event.entity, respawnable->lastCheckpointLoc.x, respawnable->lastCheckpointLoc.y);
 
+    if (event.eventDef.zone.finish) {
+        SPDLOG_INFO("Entity {} has finished the level!", event.entity);
+        despawn(event.entity, *respawnable);
+        respawnable->finished = true;
+        dispatcher_.enqueue(Event<Death>(event.entity, Death {}));
+    }
 }
 
 void CheckpointManager::update(sf::Time delta) {
     registry_.view<Respawnable>().each(
         [this, delta](const auto entity, Respawnable &respawnable) {
-            if (!respawnable.dead) {
+            if (!respawnable.dead || respawnable.finished) {
                 return;
             }
 
@@ -66,8 +76,6 @@ void CheckpointManager::despawn(entt::entity entity, Respawnable& respawnable) {
     registry_.remove_if_exists<Follow>(entity);
 
     dispatcher_.enqueue(Event<Death>(entity, Death {}));
-
-
 
     respawnable.dead = true;
     respawnable.currentRespawnTime = respawnable.respawnTime;

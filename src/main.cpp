@@ -14,11 +14,24 @@
 #include "map_maker.h"
 #include "checkpoint_manager.h"
 
-int main() {
+std::string getMap(int argc, char *argv[]) {
+    if (argc < 2) {
+        return "data/map.svg";
+    }
+
+    if (argc > 3) {
+        throw std::runtime_error("Incorrect number of arguments supplied");
+    }
+
+    return argv[2];
+}
+
+int main(int argc, char *argv[]) {
     spdlog::set_level(spdlog::level::debug);
     spdlog::set_pattern("%Y-%m-%d %@ %! [%l] %v");
 
-    SPDLOG_INFO("Starting game");
+    auto mapPath = getMap(argc, argv);
+    SPDLOG_INFO("Starting game, using map: {}", mapPath);
 
     auto settings = sf::ContextSettings();
     settings.antialiasingLevel = 8;
@@ -38,7 +51,7 @@ int main() {
     MapMaker mapMaker(registry, physics);
     CheckpointManager checkpointManager(registry, dispatcher);
 
-    mapMaker.make("data/002-fall.svg");
+    mapMaker.make(mapPath);
 
     sf::Clock deltaClock;
     UIAction action;

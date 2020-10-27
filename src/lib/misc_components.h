@@ -36,8 +36,9 @@ struct DeathZone {
 
 struct Checkpoint {
     sf::Vector2f respawnLoc;
+    bool finish = false;
 
-    inline explicit Checkpoint(sf::Vector2f respawnLoc): respawnLoc(respawnLoc) {};
+    inline explicit Checkpoint(sf::Vector2f respawnLoc, bool finish): respawnLoc(respawnLoc), finish(finish) {};
 };
 
 struct Respawnable {
@@ -45,6 +46,7 @@ struct Respawnable {
     sf::Time respawnTime;
     sf::Time currentRespawnTime;
     bool dead = false;
+    bool finished = false;
 
     inline explicit Respawnable(sf::Vector2f lastCheckpointLoc, sf::Time respawnTime):
         lastCheckpointLoc(lastCheckpointLoc), respawnTime(respawnTime) {};
