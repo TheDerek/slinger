@@ -192,6 +192,12 @@ float Physics::toDegrees(float deg) {
 }
 
 void Physics::manageMovement(entt::entity entity, b2Body &body, Movement &movement) {
+    if (Respawnable* respawnable = registry_.try_get<Respawnable>(entity)) {
+        if (respawnable->dead) {
+            return;
+        }
+    }
+
     if (!isOnFloor(entity)) {
         movement.direction = 0;
         return;
