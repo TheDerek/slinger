@@ -222,7 +222,7 @@ void Physics::manageMovement(entt::entity entity, b2Body &body, Movement &moveme
 
     float velChange = desiredVel - body.GetLinearVelocity().x;
     float impulse = body.GetMass() * velChange;
-    body.ApplyLinearImpulseToCenter(b2Vec2(impulse, 0), false);
+    body.ApplyLinearImpulseToCenter(b2Vec2(impulse, 0), true);
 
     movement.direction = 0;
 }

@@ -7,6 +7,7 @@
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #include <entt/entt.hpp>
+#include <level_scene.h>
 
 #include "physics.h"
 #include "illustrator.h"
@@ -14,16 +15,23 @@
 #include "map_maker.h"
 #include "checkpoint_manager.h"
 
-std::string getMap(int argc, char *argv[]) {
+/**
+ * Fetch the map from the program arguments, return an empty optional if no map path is
+ * provided
+ * @param argc
+ * @param argv
+ * @return the path to the map supplied in the given arguments, or empty if none
+ */
+std::optional<std::string> getMap(int argc, char *argv[]) {
     if (argc < 2) {
-        return "data/map.svg";
+        return std::optional<std::string>();
     }
 
     if (argc > 3) {
         throw std::runtime_error("Incorrect number of arguments supplied");
     }
 
-    return argv[2];
+    return std::string(argv[1]);
 }
 
 int main(int argc, char *argv[]) {
@@ -31,7 +39,11 @@ int main(int argc, char *argv[]) {
     spdlog::set_pattern("%Y-%m-%d %@ %! [%l] %v");
 
     auto mapPath = getMap(argc, argv);
-    SPDLOG_INFO("Starting game, using map: {}", mapPath);
+    SPDLOG_INFO("Starting game, using map: {}", mapPath.value_or("No map found"));
+
+    if (!mapPath) {
+        throw std::runtime_error("Main menu not yet implemented");
+    }
 
     auto settings = sf::ContextSettings();
     settings.antialiasingLevel = 8;
@@ -42,36 +54,11 @@ int main(int argc, char *argv[]) {
 
     window.setKeyRepeatEnabled(false);
 
-    entt::registry registry;
-    entt::dispatcher dispatcher;
-
-    Physics physics(registry, dispatcher);
-    Illustrator illustrator(window, registry, dispatcher);
-    InputManager inputManager(window, dispatcher, registry);
-    MapMaker mapMaker(registry, physics);
-    CheckpointManager checkpointManager(registry, dispatcher);
-
-    mapMaker.make(mapPath);
-
-    sf::Clock deltaClock;
-    UIAction action;
+    LevelScene level(mapPath.value(), window);
 
     // Start the game loop
-    do {
-        action = inputManager.handleInput();
-
-        // Clear screen
-        window.clear(sf::Color::White);
-
-        // Get the mouse pos
-        sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-
-        auto delta = deltaClock.restart();
-        checkpointManager.update(delta);
-        physics.handlePhysics(registry, delta.asSeconds(), mousePos);
-        illustrator.draw(registry);
-
-        // Update the window
+    while (true) {
+        level.step();
         window.display();
-    } while (action != UIAction::CLOSE_GAME);
+    }
 }
