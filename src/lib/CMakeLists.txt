@@ -15,7 +15,7 @@ add_library(slingerlib
     map_maker/regexer.h
     map_maker/map_maker.h
     map_maker/map_maker.cpp
-        map_maker/path_builder.cpp map_maker/path_builder.h)
+        map_maker/path_builder.cpp map_maker/path_builder.h animation.cpp animation.h)
 
 target_include_directories(slingerlib PUBLIC
     .

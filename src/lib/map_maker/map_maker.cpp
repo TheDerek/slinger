@@ -91,31 +91,33 @@ void MapShapeBuilder::makeWall(const pugi::xml_node &node) {
 
 MapShapeBuilder::MapShapeBuilder(entt::registry &registry, Physics &physics):
     registry_(registry),
-    physics_(physics)
+    physics_(physics),
+    playerFrames_(std::make_shared<sf::Texture>(sf::Texture()))
 {
-
+    playerFrames_->loadFromFile("data/character/running.png");
 }
 
 void MapShapeBuilder::makePlayer(const pugi::xml_node &node) {
     Dimensions dimensions(node);
+
+    Animation running(playerFrames_, 8, getFrames(*playerFrames_, 8));
 
     // The rectangle player
     auto player = BodyBuilder(registry_, physics_)
         .setPos(dimensions.x, dimensions.y)
         .setFixedRotation(true)
         .addRect(1, 2)
-        .setColor(sf::Color(235, 186, 52))
-        .makeFixture()
-        .draw()
-        .setZIndex(MapShapeBuilder::PLAYER_BODY_Z_INDEX)
-        .attachToBody()
+            .makeFixture()
+            .setAnimation(running)
+            .setZIndex(MapShapeBuilder::PLAYER_BODY_Z_INDEX)
+            .attachToBody()
         .addRect(0.8f, 0.1f)
-        .setPos(0, -1)
-        .setSensor()
-        .setColor(sf::Color(255, 255, 255))
-        .makeFixture()
-        .setFootSensor()
-        .attachToBody()
+            .setPos(0, -1)
+            .setSensor()
+            .setColor(sf::Color(255, 255, 255))
+            .makeFixture()
+            .setFootSensor()
+            .attachToBody()
         .create();
 
     // Follow the player, enable checkpoints and add a timer

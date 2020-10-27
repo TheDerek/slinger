@@ -11,6 +11,7 @@
 #include <SFML/Graphics/RectangleShape.hpp>
 #include "physics.h"
 #include "illustrator.h"
+#include "animation.h"
 
 class ShapeBuilder;
 
@@ -23,6 +24,7 @@ struct ShapePrototype {
     float density = 1;
     float friction = 0.2f;
     int zIndex = 0;
+    std::optional<Animation> animation;
 };
 
 struct AttachPrototype {
@@ -67,8 +69,9 @@ public:
 
     static ShapeBuilder CreateRect(float width, float height);
     static ShapeBuilder CreatePolygon(const std::vector<sf::Vector2f>& points);
-
     void setBodyBuilder(BodyBuilder *bodyBuilder);
+
+
     ShapeBuilder& setPos(float x, float y);
     ShapeBuilder& setRot(float x);
     ShapeBuilder& draw();
@@ -79,6 +82,7 @@ public:
     ShapeBuilder& setColor(sf::Color color);
     ShapeBuilder& setFootSensor();
     ShapeBuilder& setZIndex(int z);
+    ShapeBuilder& setAnimation(Animation animation);
 
     /**
      * Attach the built shape to the body. This is undefined if this builder was not created with a
@@ -87,6 +91,12 @@ public:
      */
     BodyBuilder& attachToBody();
 
+    /**
+     * Create the shape without any physics attributes
+     * @param registry
+     * @param entity
+     * @return the entity the created shape is attached to
+     */
     entt::entity create(entt::registry& registry, std::optional<entt::entity> entity = std::optional<entt::entity>());
 
 private:

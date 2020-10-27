@@ -10,9 +10,11 @@
 #include <entt/signal/dispatcher.hpp>
 #include "misc_components.h"
 #include "events.h"
+#include "animation.h"
 
 struct Drawable {
     std::unique_ptr<sf::Shape> value;
+    std::optional<Animation> animation;
     int zIndex = 0;
 };
 

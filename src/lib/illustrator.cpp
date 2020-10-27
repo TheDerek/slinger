@@ -55,12 +55,17 @@ void Illustrator::draw(entt::registry &registry) {
     window_.setView(camera_);
 
     registry.view<Drawable>().each(
-        [this, &registry](const auto entity, const Drawable &drawable) {
+        [this, &registry](const auto entity, Drawable &drawable) {
             auto &pos = drawable.value->getPosition();
 
             if (registry.has<entt::tag<"wrapView"_hs>>(entity)
                 && absolute(camera_.getCenter() - pos) > absolute(camera_.getSize() / 2.f)) {
                 drawable.value->setPosition(pos + 2.f * (camera_.getCenter() - pos));
+            }
+
+            if (drawable.animation.has_value()) {
+                drawable.value->setTexture(drawable.animation.value().getTexture().get());
+                drawable.value->setTextureRect(drawable.animation->getFrame(0));
             }
 
             window_.draw(*drawable.value);

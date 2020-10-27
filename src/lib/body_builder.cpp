@@ -73,7 +73,7 @@ entt::entity ShapeBuilder::create(entt::registry &registry, std::optional<entt::
 
     registry.emplace<Drawable>(
         entity.value(),
-        Drawable { std::move(prototype_.shape), prototype_.zIndex }
+        Drawable { std::move(prototype_.shape), prototype_.animation, prototype_.zIndex }
     );
 
     return entity.value();
@@ -100,7 +100,6 @@ ShapeBuilder ShapeBuilder::CreatePolygon(const std::vector<sf::Vector2f>& points
     return ShapeBuilder(std::move(shape));
 }
 
-
 BodyBuilder::BodyBuilder(entt::registry &registry, Physics &physics) :
     registry_(registry),
     physics_(physics) {
@@ -119,6 +118,14 @@ ShapeBuilder BodyBuilder::addPolygon(const std::vector<sf::Vector2f>& points) {
     builder.setBodyBuilder(this);
 
     return builder;
+}
+
+
+ShapeBuilder &ShapeBuilder::setAnimation(Animation animation) {
+    prototype_.animation = animation;
+    prototype_.draw = true;
+
+    return *this;
 }
 
 
@@ -167,7 +174,7 @@ entt::entity BodyBuilder::create() {
         if (prototype.draw) {
             registry_.emplace<Drawable>(
                 shapeEntity,
-                Drawable { std::move(prototype.shape), prototype.zIndex }
+                Drawable { std::move(prototype.shape), prototype.animation, prototype.zIndex }
             );
         }
     }

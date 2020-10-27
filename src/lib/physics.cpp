@@ -410,6 +410,7 @@ float RopeHitCallback::ReportFixture(
 
     auto drawable = Drawable{
         std::make_unique<sf::RectangleShape>(sf::Vector2f(16, width)),
+        std::optional<Animation>(),
         3
     };
     drawable.value->setOrigin(0, width / 2.f);
