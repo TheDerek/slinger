@@ -30,6 +30,8 @@ class MapShapeBuilder {
     entt::registry& registry_;
     Physics& physics_;
     std::shared_ptr<sf::Texture> playerFrames_;
+    std::shared_ptr<sf::Texture> iceBerg_;
+
 
 public:
     MapShapeBuilder(entt::registry& registry, Physics& physics);

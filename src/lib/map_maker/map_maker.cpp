@@ -95,6 +95,7 @@ MapShapeBuilder::MapShapeBuilder(entt::registry &registry, Physics &physics):
     playerFrames_(std::make_shared<sf::Texture>(sf::Texture()))
 {
     playerFrames_->loadFromFile("data/character/running.png");
+    playerFrames_->setSmooth(true);
 }
 
 void MapShapeBuilder::makePlayer(const pugi::xml_node &node) {

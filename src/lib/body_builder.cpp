@@ -122,6 +122,7 @@ ShapeBuilder BodyBuilder::addPolygon(const std::vector<sf::Vector2f>& points) {
 
 
 ShapeBuilder &ShapeBuilder::setAnimation(Animation animation) {
+    prototype_.shape->scale(1, -1);
     prototype_.animation = animation;
     prototype_.draw = true;
 
