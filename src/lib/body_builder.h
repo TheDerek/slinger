@@ -79,6 +79,7 @@ public:
     ShapeBuilder& setColor(sf::Color color);
     ShapeBuilder& setFootSensor();
     ShapeBuilder& setZIndex(int z);
+    ShapeBuilder& setOutline(float thickness, sf::Color color = sf::Color::Black);
 
     /**
      * Attach the built shape to the body. This is undefined if this builder was not created with a

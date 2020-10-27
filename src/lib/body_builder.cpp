@@ -100,6 +100,13 @@ ShapeBuilder ShapeBuilder::CreatePolygon(const std::vector<sf::Vector2f>& points
     return ShapeBuilder(std::move(shape));
 }
 
+ShapeBuilder &ShapeBuilder::setOutline(float thickness, sf::Color color) {
+    prototype_.shape->setOutlineThickness(thickness);
+    prototype_.shape->setOutlineColor(color);
+
+    return *this;
+}
+
 
 BodyBuilder::BodyBuilder(entt::registry &registry, Physics &physics) :
     registry_(registry),

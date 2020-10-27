@@ -52,6 +52,9 @@ private:
 
     static const sf::Color WALL_COLOUR;
     static const sf::Color DECORATION_COLOUR;
+    static const sf::Color DECORATION_OUTLINE_COLOUR;
+    static const float DECORATION_OUTLINE_THICKNESS;
+
 };
 
 /**
