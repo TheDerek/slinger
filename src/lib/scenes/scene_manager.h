@@ -12,6 +12,7 @@ class SceneManager {
     std::unique_ptr<Scene> scene_;
     entt::dispatcher sceneDispatcher_;
     sf::RenderWindow& window_;
+    std::string lastLevelPath_;
     bool shouldExit_ = false;
 
     void exitGame(ExitGame event);

@@ -67,8 +67,7 @@ void CheckpointManager::update(sf::Time delta) {
                         finishTime = timeable->getElapsedTime();
                     }
 
-//                    sceneDispatcher_.enqueue(FinishLevel { finishTime });
-                        sceneDispatcher_.trigger(ExitGame {});
+                    sceneDispatcher_.enqueue(FinishLevel { finishTime });
                     respawnable.finished = false;
                 } else {
                     respawn(entity, respawnable);

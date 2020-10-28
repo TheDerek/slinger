@@ -2,6 +2,7 @@
 #include <utility>
 #include <spdlog/spdlog.h>
 #include <events.h>
+#include <filesystem>
 #include "main_menu_scene.h"
 
 const float MainMenuScene::MARGIN = 10;
@@ -14,8 +15,6 @@ MainMenuScene::MainMenuScene(const std::string& levelLocation, sf::RenderWindow 
     window_(window),
     menu_(font_, window)
 {
-    window_.setFramerateLimit(60);
-
     if (!font_.loadFromFile("data/LiberationMono-Regular.ttf"))
     {
         throw std::runtime_error("Could not locate font");
@@ -27,8 +26,9 @@ MainMenuScene::MainMenuScene(const std::string& levelLocation, sf::RenderWindow 
     titleText_.setString("Slinger!");
 
     menu_.addTitle("Select level to play");
-    menu_.addItem("Beginning [Not Completed]", StartLevel(levelLocation_ + "001-beginning.svg"));
-    menu_.addItem("Fall [Not Completed]", StartLevel(levelLocation_ + "002-fall.svg"));
+    for (const auto& level : getLevels(levelLocation)) {
+        menu_.addItem(level.getDisplayName(), StartLevel(level.getPath()));
+    }
     menu_.addSpacer();
     menu_.addItem("How to Play", std::monostate{});
     menu_.addItem("Exit", ExitGame());
@@ -37,6 +37,8 @@ MainMenuScene::MainMenuScene(const std::string& levelLocation, sf::RenderWindow 
     authorText_.setCharacterSize(16);
     authorText_.setFillColor(sf::Color::White);
     authorText_.setString("Game made by Derek, please contact mail@derek.tech for feedback!");
+
+    reposition(window_.getSize().x, window_.getSize().y);
 }
 
 void MainMenuScene::step() {
@@ -56,22 +58,7 @@ void MainMenuScene::step() {
         // catch the resize events
         if (event.type == sf::Event::Resized)
         {
-            // update the view to the new size of the window
-            sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
-            window_.setView(sf::View(visibleArea));
-
-            // Update the title position
-            auto x = (window_.getSize().x / 2.f) - titleText_.getLocalBounds().width / 2.f;
-            auto y = MainMenuScene::MARGIN;
-            titleText_.setPosition(x, y);
-
-            // Update the menu position
-            menu_.reposition();
-
-            // Update the author position
-            x = (window_.getSize().x / 2.f) - authorText_.getLocalBounds().width / 2.f;
-            y = window_.getSize().y - authorText_.getLocalBounds().height - MARGIN;
-            authorText_.setPosition(x, y);
+           reposition(event.size.width, event.size.height);
         }
     }
 
@@ -79,6 +66,37 @@ void MainMenuScene::step() {
     window_.draw(titleText_);
     menu_.render();
     window_.draw(authorText_);
+}
+
+void MainMenuScene::reposition(int width, int height) {
+    // update the view to the new size of the window
+    sf::FloatRect visibleArea(0, 0, width, height);
+    window_.setView(sf::View(visibleArea));
+
+    // Update the title position
+    auto x = (window_.getSize().x / 2.f) - titleText_.getLocalBounds().width / 2.f;
+    auto y = MainMenuScene::MARGIN;
+    titleText_.setPosition(x, y);
+
+    // Update the menu position
+    menu_.reposition();
+
+    // Update the author position
+    x = (window_.getSize().x / 2.f) - authorText_.getLocalBounds().width / 2.f;
+    y = window_.getSize().y - authorText_.getLocalBounds().height - MARGIN;
+    authorText_.setPosition(x, y);
+}
+
+std::vector<LevelInfo> MainMenuScene::getLevels(const std::string& levelsLoc) {
+    std::vector<LevelInfo> levels;
+
+    for(auto& p: std::filesystem::directory_iterator(levelsLoc)) {
+        if (p.path().extension() == ".svg") {
+            levels.emplace_back(LevelInfo(p.path()));
+        }
+    }
+
+    return levels;
 }
 
 Menu::Menu(const sf::Font& font, sf::RenderWindow& window):
@@ -242,4 +260,16 @@ void MenuItem::handleMousePress(float x, float y, entt::dispatcher &dispatcher) 
     if (std::holds_alternative<StartLevel>(menuAction_)) {
         dispatcher.enqueue(std::get<StartLevel>(menuAction_));
     }
+}
+
+LevelInfo::LevelInfo(std::filesystem::path path) : path_(path) {
+    displayName_ = path.replace_extension("").filename().generic_string() + " [Not attempted]";
+}
+
+const std::string &LevelInfo::getDisplayName() const {
+    return displayName_;
+}
+
+const std::filesystem::path &LevelInfo::getPath() const {
+    return path_;
 }

@@ -349,11 +349,13 @@ void Physics::onDeath(Event<Death> event) {
 
 
 void BodyDeleter::operator()(b2Body *body) const {
-    body->GetWorld()->DestroyBody(body);
+//    if (body->GetWorld()) {
+//        body->GetWorld()->DestroyBody(body);
+//    }
 }
 
 void FixtureDeleter::operator()(b2Fixture *fixture) const {
-    fixture->GetBody()->DestroyFixture(fixture);
+    //fixture->GetBody()->DestroyFixture(fixture);
 }
 
 void ContactListener::BeginContact(b2Contact *contact) {

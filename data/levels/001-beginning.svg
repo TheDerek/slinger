@@ -13,7 +13,7 @@
    height="147.41747"
    width="632.14929"
    inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
-   sodipodi:docname="map.svg">
+   sodipodi:docname="001-beginning.svg">
   <defs
      id="defs833" />
   <sodipodi:namedview
@@ -24,11 +24,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="3.6948105"
-     inkscape:cx="636.13076"
-     inkscape:cy="109.45374"
+     inkscape:zoom="7.3896208"
+     inkscape:cx="596.08977"
+     inkscape:cy="92.645227"
      inkscape:document-units="px"
-     inkscape:current-layer="layer2"
+     inkscape:current-layer="layer3"
      inkscape:document-rotation="0"
      showgrid="false"
      inkscape:window-width="2560"
@@ -56,7 +56,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -462,14 +462,6 @@
        y="19.094093"
        ry="0" />
     <rect
-       style="opacity:1;fill:#0000ff;stroke:none;stroke-width:0.27496;stroke-opacity:1"
-       id="rect1438-1-0-6-3-6-7-5-3-5-6-3"
-       width="2.3128352"
-       height="53.635857"
-       x="615.45483"
-       y="86.097252"
-       ry="0" />
-    <rect
        style="opacity:1;fill:#00ff00;stroke:none;stroke-width:0.27496;stroke-opacity:1"
        id="rect1438-1-0-6-3-6-7-5-3-5-6-3-6"
        width="2.3128352"
@@ -478,6 +470,14 @@
        y="86.097252"
        ry="0"
        inkscape:label="finish" />
+    <rect
+       style="opacity:1;fill:#0000ff;stroke:none;stroke-width:0.27496;stroke-opacity:1"
+       id="rect1438-1-0-6-3-6-7-5-3-5-6-3"
+       width="2.3128352"
+       height="53.635857"
+       x="612.64752"
+       y="86.097252"
+       ry="0" />
   </g>
   <g
      inkscape:groupmode="layer"
@@ -606,7 +606,7 @@
        id="player"
        width="1"
        height="2"
-       x="601.74255"
+       x="607.54205"
        y="137.68744"
        ry="0" />
   </g>

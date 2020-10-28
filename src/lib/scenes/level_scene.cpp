@@ -2,7 +2,7 @@
 
 LevelScene::LevelScene(const std::string &level, sf::RenderWindow &window, entt::dispatcher& sceneDispatcher):
     window_(window),
-    sceneDispatcher_(dispatcher_),
+    sceneDispatcher_(sceneDispatcher),
     physics_(registry_, dispatcher_),
     illustrator_(window_, registry_, dispatcher_),
     inputManager_(window_, dispatcher_, registry_),

@@ -7,6 +7,8 @@
 #include <variant>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <entt/signal/dispatcher.hpp>
+#include <filesystem>
+
 #include "scene.h"
 
 using MenuAction = std::variant<ExitGame, StartLevel, std::monostate>;
@@ -58,6 +60,22 @@ private:
     float getHeight();
 };
 
+class LevelInfo {
+    std::filesystem::path path_;
+public:
+    const std::filesystem::path &getPath() const;
+
+private:
+    std::string displayName_;
+public:
+    const std::string &getDisplayName() const;
+
+private:
+    std::optional<sf::Time> completionTime_;
+public:
+    LevelInfo(std::filesystem::path path);
+};
+
 class MainMenuScene : public Scene {
     const static float MARGIN;
 
@@ -73,6 +91,10 @@ class MainMenuScene : public Scene {
 public:
     explicit MainMenuScene(const std::string& levelLocation, sf::RenderWindow& window, entt::dispatcher& sceneDispatcher);
     void step() override;
+
+private:
+    void reposition(int width, int height);
+    std::vector<LevelInfo> getLevels(const std::string& levelsLoc);
 };
 
 #endif //SLINGER_MAIN_MENU_SCENE_H

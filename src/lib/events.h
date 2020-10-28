@@ -61,4 +61,14 @@ struct FinishLevel {
     sf::Time completeTime;
 };
 
+inline std::string formatTime(const sf::Time& time) {
+    int minutes = (int)time.asSeconds() / 60;
+    float seconds = time.asSeconds() - (float) (minutes * 60);
+
+    std::string display(7, '\0');
+    std::snprintf(&display[0], display.size() + 1, "%02d:%04.1f", minutes, seconds);
+
+    return display;
+}
+
 #endif //SLINGER_EVENTS_H

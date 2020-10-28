@@ -11,7 +11,7 @@ SceneManager::SceneManager(sf::RenderWindow &window, std::optional<std::string> 
     sceneDispatcher_.sink<FinishLevel>().connect<&SceneManager::finishLevel>(this);
 
     if (!levelPath) {
-        scene_ = std::make_unique<MainMenuScene>("data/", window, sceneDispatcher_);
+        scene_ = std::make_unique<MainMenuScene>("data/levels/", window, sceneDispatcher_);
     } else {
         sceneDispatcher_.trigger<StartLevel>(levelPath.value());
     }
@@ -31,10 +31,11 @@ void SceneManager::exitGame(ExitGame event) {
 }
 
 void SceneManager::startLevel(const StartLevel &event) {
+    lastLevelPath_ = event.levelPath;
     scene_ = std::make_unique<LevelScene>(event.levelPath, window_, sceneDispatcher_);
 }
 
 void SceneManager::finishLevel(const FinishLevel &event) {
-    SPDLOG_INFO("Finished level.");
-    scene_ = std::make_unique<MainMenuScene>("data/", window_, sceneDispatcher_);
+    SPDLOG_INFO("Finished level {} with time {}", lastLevelPath_, formatTime(event.completeTime));
+    scene_ = std::make_unique<MainMenuScene>("data/levels/", window_, sceneDispatcher_);
 }
