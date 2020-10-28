@@ -154,10 +154,12 @@ void MapShapeBuilder::makePlayer(const pugi::xml_node &node) {
     registry_.emplace<entt::tag<"rotate_to_mouse"_hs>>(arm);
     registry_.emplace<InputComponent>(arm, InputComponent {
         {
-            JustPressed(sf::Mouse::Left), FireRope {
-            sf::Vector2f(0, 0.5f),
-            sf::Vector2f(0, 0.7f)
-        }
+            JustPressed(sf::Mouse::Left),
+            FireRope
+            {
+                sf::Vector2f(0, 0.5f),
+                sf::Vector2f(0, 0.7f)
+            }
         }
     });
 }

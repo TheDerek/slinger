@@ -6,7 +6,10 @@
 #include <SFML/Graphics/Text.hpp>
 #include <variant>
 #include <SFML/Graphics/RectangleShape.hpp>
+#include <entt/signal/dispatcher.hpp>
 #include "scene.h"
+
+using MenuAction = std::variant<ExitGame, StartLevel, std::monostate>;
 
 class MenuItem {
     const static float PADDING;
@@ -15,14 +18,19 @@ class MenuItem {
     sf::Text label_;
     sf::RectangleShape border_;
     const bool title_;
+    const MenuAction menuAction_;
 
 public:
-    explicit MenuItem(sf::Text label_, bool title = false);
+    explicit MenuItem(sf::Text label_, MenuAction action, bool title = false);
 
     float getWidth();
     float getHeight() const;
     void setPosition(float x, float y);
     void render(sf::RenderWindow& window);
+    void handleMousePress(float x, float y, entt::dispatcher &dispatcher);
+
+private:
+    bool isClicked(float x, float y);
 };
 
 struct MenuSpacer {
@@ -38,11 +46,13 @@ class Menu {
 
 public:
     explicit Menu(const sf::Font& font, sf::RenderWindow& window);
-    void addItem(const std::string& label);
+
+    void addItem(const std::string& label, MenuAction action);
     void addTitle(const std::string& label);
     void addSpacer();
     void render();
     void reposition();
+    void handleMousePress(int x, int y, entt::dispatcher &dispatcher);
 
 private:
     float getHeight();
@@ -51,15 +61,17 @@ private:
 class MainMenuScene : public Scene {
     const static float MARGIN;
 
-    sf::RenderWindow& window_;
     const std::string& levelLocation_;
+    sf::RenderWindow& window_;
+    entt::dispatcher& sceneDispatcher_;
+
     sf::Font font_;
     sf::Text authorText_;
     sf::Text titleText_;
     Menu menu_;
 
 public:
-    explicit MainMenuScene(const std::string& levelLocation, sf::RenderWindow& window);
+    explicit MainMenuScene(const std::string& levelLocation, sf::RenderWindow& window, entt::dispatcher& sceneDispatcher);
     void step() override;
 };
 

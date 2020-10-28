@@ -1,13 +1,16 @@
 #include <SFML/Window/Event.hpp>
 #include <utility>
+#include <spdlog/spdlog.h>
+#include <events.h>
 #include "main_menu_scene.h"
 
 const float MainMenuScene::MARGIN = 10;
 const float MenuItem::MARGIN = 10;
 const float MenuItem::PADDING = 5;
 
-MainMenuScene::MainMenuScene(const std::string& levelLocation, sf::RenderWindow &window):
+MainMenuScene::MainMenuScene(const std::string& levelLocation, sf::RenderWindow &window, entt::dispatcher& sceneDispatcher):
     levelLocation_(levelLocation),
+    sceneDispatcher_(sceneDispatcher),
     window_(window),
     menu_(font_, window)
 {
@@ -24,11 +27,11 @@ MainMenuScene::MainMenuScene(const std::string& levelLocation, sf::RenderWindow 
     titleText_.setString("Slinger!");
 
     menu_.addTitle("Select level to play");
-    menu_.addItem("Beginning [Not Completed]");
-    menu_.addItem("Fall [Not Completed]");
+    menu_.addItem("Beginning [Not Completed]", StartLevel(levelLocation_ + "001-beginning.svg"));
+    menu_.addItem("Fall [Not Completed]", StartLevel(levelLocation_ + "002-fall.svg"));
     menu_.addSpacer();
-    menu_.addItem("How to Play");
-    menu_.addItem("Exit");
+    menu_.addItem("How to Play", std::monostate{});
+    menu_.addItem("Exit", ExitGame());
 
     authorText_.setFont(font_);
     authorText_.setCharacterSize(16);
@@ -39,6 +42,17 @@ MainMenuScene::MainMenuScene(const std::string& levelLocation, sf::RenderWindow 
 void MainMenuScene::step() {
     sf::Event event;
     while (window_.pollEvent(event)) {
+        if (event.type == sf::Event::Closed)
+        {
+           SPDLOG_INFO("Closing game from main menu window exit button");
+           sceneDispatcher_.enqueue(ExitGame {});
+        }
+
+        if (event.type == sf::Event::MouseButtonPressed)
+        {
+            menu_.handleMousePress(event.mouseButton.x, event.mouseButton.y, sceneDispatcher_);
+        }
+
         // catch the resize events
         if (event.type == sf::Event::Resized)
         {
@@ -73,14 +87,14 @@ Menu::Menu(const sf::Font& font, sf::RenderWindow& window):
 
 }
 
-void Menu::addItem(const std::string& label) {
+void Menu::addItem(const std::string& label, MenuAction action) {
     sf::Text text;
     text.setFont(font_);
     text.setCharacterSize(24);
     text.setFillColor(sf::Color::Black);
     text.setString(label);
 
-    items_.emplace_back(MenuItem(text));
+    items_.emplace_back(MenuItem(text, action));
 }
 
 void Menu::addTitle(const std::string &label) {
@@ -90,7 +104,7 @@ void Menu::addTitle(const std::string &label) {
     text.setFillColor(sf::Color::White);
     text.setString(label);
 
-    items_.emplace_back(MenuItem(text, true));
+    items_.emplace_back(MenuItem(text, std::monostate{}, true));
 }
 
 void Menu::render() {
@@ -151,9 +165,18 @@ void Menu::addSpacer() {
     items_.emplace_back(MenuSpacer {});
 }
 
-MenuItem::MenuItem(sf::Text label, bool title):
+void Menu::handleMousePress(int x, int y, entt::dispatcher &dispatcher) {
+    for (auto& item : items_) {
+        if (auto *menuItem = std::get_if<MenuItem>(&item)) {
+            menuItem->handleMousePress((float) x, (float) y, dispatcher);
+        }
+    }
+}
+
+MenuItem::MenuItem(sf::Text label, MenuAction action, bool title):
     label_(std::move(label)),
-    title_(title)
+    title_(title),
+    menuAction_(action)
 {
     if (title_) {
         border_.setFillColor(sf::Color::White);
@@ -195,4 +218,28 @@ void MenuItem::setPosition(float x, float y) {
 
 float MenuItem::getHeight() const {
     return label_.getLocalBounds().height + PADDING * 2 + MARGIN;
+}
+
+bool MenuItem::isClicked(float x, float y) {
+    if (title_) {
+        return false;
+    }
+
+    return border_.getGlobalBounds().contains(x, y);
+}
+
+void MenuItem::handleMousePress(float x, float y, entt::dispatcher &dispatcher) {
+    if (!isClicked(x, y)) {
+        return;
+    }
+
+    SPDLOG_INFO("'{}' button clicked", std::string(label_.getString()));
+
+    if (std::holds_alternative<ExitGame>(menuAction_)) {
+        dispatcher.enqueue(std::get<ExitGame>(menuAction_));
+    }
+
+    if (std::holds_alternative<StartLevel>(menuAction_)) {
+        dispatcher.enqueue(std::get<StartLevel>(menuAction_));
+    }
 }

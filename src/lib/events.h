@@ -47,4 +47,14 @@ struct Teleport {
     inline explicit Teleport(sf::Vector2f newLoc): newLoc(newLoc) {};
 };
 
+struct ExitGame {
+
+};
+
+struct StartLevel {
+    std::string levelPath;
+
+    inline explicit StartLevel(std::string level): levelPath(level) {};
+};
+
 #endif //SLINGER_EVENTS_H

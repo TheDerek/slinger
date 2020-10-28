@@ -10,11 +10,16 @@
 #include <level_scene.h>
 #include <scenes/main_menu_scene.h>
 
-#include "physics.h"
-#include "illustrator.h"
-#include "input_manager.h"
-#include "map_maker.h"
-#include "checkpoint_manager.h"
+bool shouldExit = false;
+std::unique_ptr<Scene> scene;
+
+void exitGame() {
+    shouldExit = true;
+}
+
+void startLevel(const StartLevel& event, sf::RenderWindow& window) {
+    scene = std::make_unique<LevelScene>(event.levelPath, window);
+}
 
 /**
  * Fetch the map from the program arguments, return an empty optional if no map path is
@@ -48,19 +53,25 @@ int main(int argc, char *argv[]) {
         sf::VideoMode(1000, 800),
         "Slinger DEV build"
     );
-
     window.setKeyRepeatEnabled(false);
 
-    std::unique_ptr<Scene> scene;
+    entt::dispatcher sceneDispatcher;
+    sceneDispatcher.sink<ExitGame>().connect<&exitGame>();
+    sceneDispatcher.sink<StartLevel>().connect<&startLevel>(window);
+
+
     if (!mapPath) {
-        scene = std::make_unique<MainMenuScene>("data/", window);
+        scene = std::make_unique<MainMenuScene>("data/", window, sceneDispatcher);
     } else {
-        //scene = std::make_unique<LevelScene>(mapPath.value(), window);
+        scene = std::make_unique<LevelScene>(mapPath.value(), window);
     }
 
     // Start the game loop
-    while (true) {
+    while (!shouldExit) {
         scene->step();
         window.display();
+
+        sceneDispatcher.update();
     }
 }
+
