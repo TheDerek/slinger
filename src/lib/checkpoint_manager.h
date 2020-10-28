@@ -19,13 +19,14 @@ namespace {
 class CheckpointManager {
     entt::registry& registry_;
     entt::dispatcher& dispatcher_;
+    entt::dispatcher& sceneDispatcher_;
 
     void onDeathZone(const EnteredDeathZone &event);
     void onCheckpoint(const EnteredCheckpoint &event);
     void respawn(entt::entity, Respawnable& respawnable);
     void despawn(entt::entity, Respawnable& respawnable);
 public:
-    CheckpointManager(entt::registry &registry, entt::dispatcher &dispatcher);
+    CheckpointManager(entt::registry &registry, entt::dispatcher &dispatcher, entt::dispatcher& sceneDispatcher);
     void update(sf::Time delta);
 };
 

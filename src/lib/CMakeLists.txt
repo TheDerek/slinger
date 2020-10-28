@@ -17,7 +17,7 @@ add_library(slingerlib
     map_maker/map_maker.cpp
     map_maker/path_builder.cpp
     map_maker/path_builder.h
-    scenes/scene.h scenes/level_scene.cpp scenes/level_scene.h scenes/main_menu_scene.cpp scenes/main_menu_scene.h)
+    scenes/scene.h scenes/level_scene.cpp scenes/level_scene.h scenes/main_menu_scene.cpp scenes/main_menu_scene.h scenes/scene_manager.cpp scenes/scene_manager.h)
 
 target_include_directories(slingerlib PUBLIC
     .

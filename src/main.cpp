@@ -9,17 +9,7 @@
 #include <entt/entt.hpp>
 #include <level_scene.h>
 #include <scenes/main_menu_scene.h>
-
-bool shouldExit = false;
-std::unique_ptr<Scene> scene;
-
-void exitGame() {
-    shouldExit = true;
-}
-
-void startLevel(const StartLevel& event, sf::RenderWindow& window) {
-    scene = std::make_unique<LevelScene>(event.levelPath, window);
-}
+#include <scenes/scene_manager.h>
 
 /**
  * Fetch the map from the program arguments, return an empty optional if no map path is
@@ -55,23 +45,7 @@ int main(int argc, char *argv[]) {
     );
     window.setKeyRepeatEnabled(false);
 
-    entt::dispatcher sceneDispatcher;
-    sceneDispatcher.sink<ExitGame>().connect<&exitGame>();
-    sceneDispatcher.sink<StartLevel>().connect<&startLevel>(window);
-
-
-    if (!mapPath) {
-        scene = std::make_unique<MainMenuScene>("data/", window, sceneDispatcher);
-    } else {
-        scene = std::make_unique<LevelScene>(mapPath.value(), window);
-    }
-
-    // Start the game loop
-    while (!shouldExit) {
-        scene->step();
-        window.display();
-
-        sceneDispatcher.update();
-    }
+    SceneManager manager(window, mapPath);
+    manager.run();
 }
 

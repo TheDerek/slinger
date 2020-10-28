@@ -1,12 +1,13 @@
 #include "level_scene.h"
 
-LevelScene::LevelScene(const std::string &level, sf::RenderWindow &window):
+LevelScene::LevelScene(const std::string &level, sf::RenderWindow &window, entt::dispatcher& sceneDispatcher):
     window_(window),
+    sceneDispatcher_(dispatcher_),
     physics_(registry_, dispatcher_),
     illustrator_(window_, registry_, dispatcher_),
     inputManager_(window_, dispatcher_, registry_),
     mapMaker_(registry_, physics_),
-    checkpointManager_(registry_, dispatcher_)
+    checkpointManager_(registry_, dispatcher_, sceneDispatcher_)
 {
     mapMaker_.make(level);
 }

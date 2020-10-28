@@ -6,8 +6,9 @@
 #include <spdlog/spdlog.h>
 #include "checkpoint_manager.h"
 
-CheckpointManager::CheckpointManager(entt::registry &registry, entt::dispatcher &dispatcher)
-    : registry_(registry), dispatcher_(dispatcher)
+CheckpointManager::CheckpointManager(entt::registry &registry, entt::dispatcher &dispatcher,
+    entt::dispatcher& sceneDispatcher)
+    : registry_(registry), dispatcher_(dispatcher), sceneDispatcher_(sceneDispatcher)
 {
     dispatcher_.sink<EnteredDeathZone>().connect<&CheckpointManager::onDeathZone>(this);
     dispatcher_.sink<EnteredCheckpoint>().connect<&CheckpointManager::onCheckpoint>(this);
@@ -52,14 +53,26 @@ void CheckpointManager::onCheckpoint(const EnteredCheckpoint &event) {
 void CheckpointManager::update(sf::Time delta) {
     registry_.view<Respawnable>().each(
         [this, delta](const auto entity, Respawnable &respawnable) {
-            if (!respawnable.dead || respawnable.finished) {
+            if (!respawnable.dead) {
                 return;
             }
 
             if (respawnable.currentRespawnTime > sf::Time::Zero) {
                 respawnable.currentRespawnTime -= delta;
             } else {
-                respawn(entity, respawnable);
+                if (respawnable.finished) {
+                    sf::Time finishTime;
+
+                    if (Timeable* timeable = registry_.try_get<Timeable>(entity)) {
+                        finishTime = timeable->getElapsedTime();
+                    }
+
+//                    sceneDispatcher_.enqueue(FinishLevel { finishTime });
+                        sceneDispatcher_.trigger(ExitGame {});
+                    respawnable.finished = false;
+                } else {
+                    respawn(entity, respawnable);
+                }
             }
         }
     );

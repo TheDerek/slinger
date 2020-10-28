@@ -57,4 +57,8 @@ struct StartLevel {
     inline explicit StartLevel(std::string level): levelPath(level) {};
 };
 
+struct FinishLevel {
+    sf::Time completeTime;
+};
+
 #endif //SLINGER_EVENTS_H

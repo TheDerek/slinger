@@ -10,11 +10,13 @@
 #include "scene.h"
 
 class LevelScene : public Scene {
+    sf::RenderWindow& window_;
+    entt::dispatcher& sceneDispatcher_;
+
     entt::registry registry_;
     entt::dispatcher dispatcher_;
     sf::Clock deltaClock_;
 
-    sf::RenderWindow& window_;
     Physics physics_;
     Illustrator illustrator_;
     InputManager inputManager_;
@@ -22,7 +24,7 @@ class LevelScene : public Scene {
     CheckpointManager checkpointManager_;
 
 public:
-    explicit LevelScene(const std::string& level, sf::RenderWindow& window);
+    explicit LevelScene(const std::string& level, sf::RenderWindow& window, entt::dispatcher& sceneDispatcher);
     void step() override;
 };
 
