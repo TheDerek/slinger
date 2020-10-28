@@ -8,6 +8,7 @@
 #include <SFML/Graphics.hpp>
 #include <entt/entt.hpp>
 #include <level_scene.h>
+#include <scenes/main_menu_scene.h>
 
 #include "physics.h"
 #include "illustrator.h"
@@ -41,10 +42,6 @@ int main(int argc, char *argv[]) {
     auto mapPath = getMap(argc, argv);
     SPDLOG_INFO("Starting game, using map: {}", mapPath.value_or("No map found"));
 
-    if (!mapPath) {
-        throw std::runtime_error("Main menu not yet implemented");
-    }
-
     auto settings = sf::ContextSettings();
     settings.antialiasingLevel = 8;
     sf::RenderWindow window(
@@ -54,11 +51,16 @@ int main(int argc, char *argv[]) {
 
     window.setKeyRepeatEnabled(false);
 
-    LevelScene level(mapPath.value(), window);
+    std::unique_ptr<Scene> scene;
+    if (!mapPath) {
+        scene = std::make_unique<MainMenuScene>("data/", window);
+    } else {
+        //scene = std::make_unique<LevelScene>(mapPath.value(), window);
+    }
 
     // Start the game loop
     while (true) {
-        level.step();
+        scene->step();
         window.display();
     }
 }

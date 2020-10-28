@@ -22,7 +22,6 @@ struct Dimensions {
     Dimensions(const pugi::xml_node &node);
 };
 
-
 /**
  * Builds Box2d bodies and sfml shapes from svg shapes
  */
