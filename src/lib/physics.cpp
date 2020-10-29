@@ -151,7 +151,11 @@ FixtureInfoPtr &Physics::makeFixture(
     }
 
     if (polygon) {
-        b2Vec2 vertices[polygon->getPointCount()];
+        if (polygon->getPointCount() > 100) {
+            throw std::runtime_error("Polygons with more than 100 points are not supported");
+        }
+
+        b2Vec2 vertices[100];
         for (size_t i = 0; i < polygon->getPointCount(); i++) {
             vertices[i].Set(polygon->getPoint(i).x, polygon->getPoint(i).y);
         }

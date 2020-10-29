@@ -3,6 +3,7 @@
 //
 
 #include <set>
+#include <optional>
 #include "path_builder.h"
 
 const Regexer PathBuilder::COMMAND_REGEX = Regexer(R"(\s?([a-df-zA-Z])(?:\s([^a-df-zA-Z]+))?)");

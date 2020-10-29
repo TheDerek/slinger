@@ -32,7 +32,7 @@ MainMenuScene::MainMenuScene(
 
     menu_.addTitle("Select level to play");
     for (const auto& level : getLevels(levelLocation, times)) {
-        menu_.addItem(level.getDisplayName(), StartLevel(level.getPath()));
+        menu_.addItem(level.getDisplayName(), StartLevel(level.getPath().generic_string()));
     }
     menu_.addSpacer();
     menu_.addItem("How to Play", std::monostate{});
@@ -106,7 +106,7 @@ std::vector<LevelInfo> MainMenuScene::getLevels(const std::string& levelsLoc, co
         if (p.path().extension() == ".svg") {
             std::optional<sf::Time> time;
             if (times.contains(p.path())) {
-                time = sf::milliseconds(times[p.path()]);
+                time = sf::milliseconds(times[p.path().generic_string()]);
             }
 
             levels.emplace_back(LevelInfo(p.path(), time));

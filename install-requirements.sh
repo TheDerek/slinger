@@ -1,4 +1,4 @@
 #! /usr/bin/env bash
 
 echo "Installing.."
-while read p; do ./vcpkg/vcpkg install "$p"; done <requirements.txt
+while read p; do ./vcpkg/vcpkg.exe install "$p"; done <requirements.txt

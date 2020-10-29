@@ -3,6 +3,8 @@
 
 
 #include <memory>
+#include <optional>
+
 #include <entt/signal/dispatcher.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <events.h>
