@@ -55,7 +55,7 @@ void MapMaker::make(const std::string& path)
         mapShapeBuilder_.makeDeathZone(zone.node());
     }
 
-    auto checkPoints = doc.select_nodes("/svg/g[@inkscape:label='checkpoints']/rect");
+    auto checkPoints = doc.select_nodes("/svg/g[@inkscape:label='checkpoints']/*");
     SPDLOG_DEBUG("Added {} checkpoints from {}", checkPoints.size(), path);
     for (const auto& zone: checkPoints) {
         mapShapeBuilder_.makeCheckpoint(zone.node());
@@ -239,26 +239,42 @@ entt::entity MapShapeBuilder::makeDeathZone(const pugi::xml_node &node) {
 }
 
 void MapShapeBuilder::makeCheckpoint(const pugi::xml_node &node) {
-    Dimensions dimensions(node);
-
-    if (strcmp(node.name(), "rect") != 0) {
-        throw std::runtime_error("Unsupported element type for checkpoint");
-    }
-
-    auto entity = BodyBuilder(registry_, physics_)
-        .setPos(dimensions.x, dimensions.y)
-        .setType(b2_staticBody)
-        .addRect(dimensions.width, dimensions.height)
-        .setSensor()
-        .makeFixture()
-        .attachToBody()
-        .create();
-
-    // Respawn at the bottom of the checkpoint with a small jump for the player
-    auto respawnLoc = sf::Vector2f(dimensions.x, (dimensions.y - dimensions.height / 2.f) + 2.3f);
+    entt::entity entity;
+    sf::Vector2f respawnLoc(0, 0);
 
     auto label = node.attribute("inkscape:label");
     bool finish = strcmp(label.value(), "finish") == 0;
+
+    if (strcmp(node.name(), "rect") == 0) {
+        Dimensions dimensions(node);
+
+        entity = BodyBuilder(registry_, physics_)
+            .setPos(dimensions.x, dimensions.y)
+            .setType(b2_staticBody)
+            .addRect(dimensions.width, dimensions.height)
+                .setSensor()
+                .makeFixture()
+                .attachToBody()
+            .create();
+
+        // Respawn at the bottom of the checkpoint with a small jump for the player
+        respawnLoc = sf::Vector2f(dimensions.x, (dimensions.y - dimensions.height / 2.f) + 2.3f);
+    } else {
+        auto svgPoints = node.attribute("d").as_string();
+        auto points = PathBuilder::build(svgPoints);
+
+        entity = BodyBuilder(registry_, physics_)
+            .setType(b2_staticBody)
+            .addPolygon(points)
+                .setSensor()
+                .makeFixture()
+                .attachToBody()
+            .create();
+
+        if (!finish) {
+            throw std::runtime_error("Polyagonal checkpoints are only supported for finishing lines");
+        }
+    }
 
     registry_.emplace<Checkpoint>(entity, respawnLoc, finish);
 }
