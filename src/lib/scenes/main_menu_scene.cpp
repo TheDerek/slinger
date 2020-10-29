@@ -76,6 +76,8 @@ void MainMenuScene::step() {
     window_.draw(titleText_);
     menu_.render();
     window_.draw(authorText_);
+
+    window_.display();
 }
 
 void MainMenuScene::reposition(int width, int height) {
@@ -153,8 +155,6 @@ void Menu::render() {
 
         std::get<MenuItem>(item).render(window_);
     }
-
-    window_.display();
 }
 
 void Menu::reposition() {
