@@ -64,6 +64,10 @@ void SceneManager::writeLevelTime(const std::string &levelPath, const sf::Time &
 }
 
 SceneManager::json SceneManager::getLevelTimes() {
+    if(!std::filesystem::exists(SceneManager::LEVEL_TIMES_PATH)) {
+        return json();
+    }
+
     std::ifstream inputFile(SceneManager::LEVEL_TIMES_PATH);
     json times;
     inputFile >> times;
