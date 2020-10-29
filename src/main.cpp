@@ -32,7 +32,7 @@ std::optional<std::string> getMap(int argc, char *argv[]) {
 
 int main(int argc, char *argv[]) {
     spdlog::set_level(spdlog::level::debug);
-    spdlog::set_pattern("%Y-%m-%d %@ %! [%l] %v");
+    spdlog::set_pattern("%Y-%m-%d %! [%l] %v");
 
     auto mapPath = getMap(argc, argv);
     SPDLOG_INFO("Starting game, using map: {}", mapPath.value_or("No map found"));
