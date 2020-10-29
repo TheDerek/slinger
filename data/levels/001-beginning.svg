@@ -24,11 +24,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="10.450502"
-     inkscape:cx="607.62256"
-     inkscape:cy="118.4098"
+     inkscape:zoom="14.779242"
+     inkscape:cx="293.54392"
+     inkscape:cy="88.594592"
      inkscape:document-units="px"
-     inkscape:current-layer="layer5"
+     inkscape:current-layer="layer2"
      inkscape:document-rotation="0"
      showgrid="false"
      inkscape:window-width="2560"
@@ -108,7 +108,7 @@
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
        id="platformrect"
        width="15.392158"
-       height="30.206623"
+       height="67.563667"
        x="87.120934"
        y="29.472157"
        ry="0" />
@@ -187,9 +187,9 @@
     <rect
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
        id="rect1433-6-5-3-7-7"
-       width="20.313629"
+       width="28.541376"
        height="45.16777"
-       x="322.6738"
+       x="314.44604"
        y="74.473312"
        ry="0" />
     <rect
@@ -605,7 +605,7 @@
     <rect
        style="fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
        id="rect1433-6-5-5-6-1-9"
-       width="68.784271"
+       width="60.556519"
        height="16.621006"
        x="253.88953"
        y="89.379333"
