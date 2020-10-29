@@ -1,1 +1,4 @@
 data/times.json
+.idea/
+out/
+cmake-build-*/

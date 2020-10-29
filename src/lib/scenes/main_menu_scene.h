@@ -9,6 +9,7 @@
 #include <entt/signal/dispatcher.hpp>
 #include <filesystem>
 #include <nlohmann/json.hpp>
+#include <optional>
 
 #include "scene.h"
 

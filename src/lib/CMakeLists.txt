@@ -25,7 +25,7 @@ target_include_directories(slingerlib PUBLIC
     scenes/.
 )
 
-find_package(box2d REQUIRED)
+find_package(unofficial-box2d REQUIRED)
 find_package(SFML 2.5 COMPONENTS graphics audio system window REQUIRED)
 find_package(EnTT REQUIRED)
 find_package(pugixml REQUIRED)
@@ -36,20 +36,18 @@ find_package(GLUT REQUIRED)
 
 include(FindOpenGL)
 
-add_dependencies(slingerlib OpenGL::OpenGL)
 include_directories(${GLUT_INCLUDE_DIRS} )
 
 target_link_libraries(slingerlib
     PUBLIC
-        OpenGL::OpenGL
-        OpenGL::GLX
+        OpenGL
         ${GLUT_LIBRARY}
         sfml-graphics
         sfml-audio
         sfml-system
         sfml-window
         ${EnTTTargets}
-        box2d
+        unofficial::box2d::box2d
         pugixml
         spdlog::spdlog
         nlohmann_json::nlohmann_json
