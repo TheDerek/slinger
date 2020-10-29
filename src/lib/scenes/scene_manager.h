@@ -30,6 +30,7 @@ class SceneManager {
     void exitGame(ExitGame event);
     void startLevel(const StartLevel& event);
     void finishLevel(const FinishLevel& event);
+    void exitLevel(const ExitLevel& event);
 
 public:
     SceneManager(sf::RenderWindow& window, std::optional<std::string> levelPath);

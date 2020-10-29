@@ -6,8 +6,17 @@
 #include "input_manager.h"
 #include "misc_components.h"
 
-InputManager::InputManager(sf::RenderWindow &window, entt::dispatcher& dispatcher, entt::registry& registry) :
-    window_(window), dispatcher_(dispatcher), registry_(registry) {
+InputManager::InputManager(
+    sf::RenderWindow &window,
+    entt::dispatcher& dispatcher,
+    entt::dispatcher& sceneDispatcher,
+    entt::registry& registry
+):
+    window_(window),
+    dispatcher_(dispatcher),
+    sceneDispatcher_(sceneDispatcher),
+    registry_(registry)
+{
 
 }
 
@@ -20,9 +29,12 @@ UIAction InputManager::handleInput() {
     sf::Event event;
     while (window_.pollEvent(event)) {
         // Close window: exit
-        if (event.type == sf::Event::Closed ||
-            (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape)) {
-            return UIAction::CLOSE_GAME;
+        if (event.type == sf::Event::Closed) {
+            sceneDispatcher_.enqueue(ExitGame());
+        }
+
+        if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape) {
+            sceneDispatcher_.enqueue(ExitLevel());
         }
 
         if (event.type == sf::Event::KeyPressed) {
@@ -31,6 +43,12 @@ UIAction InputManager::handleInput() {
 
         if (event.type == sf::Event::MouseButtonPressed) {
             firstTimeButtonPresses_.insert(event.mouseButton.button);
+        }
+
+        // catch the resize events
+        if (event.type == sf::Event::Resized)
+        {
+            dispatcher_.enqueue(ResizeWindow {event.size.width, event.size.height });
         }
     }
 

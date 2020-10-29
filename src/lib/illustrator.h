@@ -33,8 +33,8 @@ private:
     sf::Vector2f absolute(const sf::Vector2f& vec);
     void addRope(const Event<FireRope>& event);
     void onPlayerDeath(const Event<Death>& event);
-
     void onAddDrawable(entt::registry &registry, entt::entity entity);
+    void resizeWindow(ResizeWindow event);
 };
 
 inline bool operator> (const sf::Vector2f& lhs, const sf::Vector2f& rhs);

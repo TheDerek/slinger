@@ -61,6 +61,13 @@ struct FinishLevel {
     sf::Time completeTime;
 };
 
+struct ExitLevel {};
+
+struct ResizeWindow {
+    unsigned int width;
+    unsigned int height;
+};
+
 inline std::string formatTime(const sf::Time& time) {
     int minutes = (int)time.asSeconds() / 60;
     float seconds = time.asSeconds() - (float) (minutes * 60);

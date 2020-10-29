@@ -14,6 +14,7 @@ SceneManager::SceneManager(sf::RenderWindow &window, std::optional<std::string> 
     sceneDispatcher_.sink<ExitGame>().connect<&SceneManager::exitGame>(this);
     sceneDispatcher_.sink<StartLevel>().connect<&SceneManager::startLevel>(this);
     sceneDispatcher_.sink<FinishLevel>().connect<&SceneManager::finishLevel>(this);
+    sceneDispatcher_.sink<ExitLevel>().connect<&SceneManager::exitLevel>(this);
 
     if (!levelPath) {
         openMainMenu();
@@ -74,4 +75,8 @@ SceneManager::json SceneManager::getLevelTimes() {
 
 void SceneManager::openMainMenu() {
     scene_ = std::make_unique<MainMenuScene>(LEVEL_PATH, window_, sceneDispatcher_, getLevelTimes());
+}
+
+void SceneManager::exitLevel(const ExitLevel &event) {
+    openMainMenu();
 }

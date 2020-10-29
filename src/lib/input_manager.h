@@ -57,7 +57,7 @@ using InputComponent = std::unordered_map<InputButton, std::variant<InputAction,
 
 class InputManager {
 public:
-    InputManager(sf::RenderWindow&, entt::dispatcher&, entt::registry&);
+    InputManager(sf::RenderWindow&, entt::dispatcher& dispatcher, entt::dispatcher& sceneDispatcher, entt::registry&);
     UIAction handleInput();
     void handleMovement(entt::entity entity, InputAction action, Movement &movement);
 
@@ -71,6 +71,7 @@ private:
     sf::RenderWindow& window_;
     entt::registry& registry_;
     entt::dispatcher& dispatcher_;
+    entt::dispatcher& sceneDispatcher_;
     std::set<sf::Keyboard::Key> firstTimeKeyPresses_;
     std::set<sf::Mouse::Button> firstTimeButtonPresses_;
 };

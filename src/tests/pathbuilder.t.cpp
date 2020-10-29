@@ -4,7 +4,6 @@
 #include "regexer.h"
 
 TEST(PathBuilder, CanBuildPath) {
-    //TODO Find a neater regex that trims the whitespace at the end of the matches
     Regexer regexer(PathBuilder::COMMAND_REGEX);
 
     auto matches = regexer.search("M 72.732231,91.993675 H 85.979527 L 72.732231,118.39366 Z");
@@ -19,7 +18,6 @@ TEST(PathBuilder, CanBuildPath) {
 }
 
 TEST(PathBuilder, CanParseExponentInCommand) {
-    //TODO Find a neater regex that trims the whitespace at the end of the matches
     Regexer regexer(PathBuilder::COMMAND_REGEX);
 
     auto matches = regexer.search("M 72.732231e10,91.993675 H 85.979527 L 72.732231,118.39366 Z");
@@ -32,7 +30,6 @@ TEST(PathBuilder, CanParseExponentInCommand) {
 }
 
 TEST(PathBuilder, CanParseNumber) {
-    //TODO Find a neater regex that trims the whitespace at the end of the matches
     Regexer regexer(PathBuilder::COORDINATE_REGEX);
 
     auto matches = regexer.search("72.732231,91.993675 85.979527,118.39366");
@@ -44,7 +41,6 @@ TEST(PathBuilder, CanParseNumber) {
 }
 
 TEST(PathBuilder, CanParseNumberWithExponent) {
-    //TODO Find a neater regex that trims the whitespace at the end of the matches
     Regexer regexer(PathBuilder::COORDINATE_REGEX);
 
     auto matches = regexer.search("72.732231e10,91.993675 85.979527e-8,118.39366");

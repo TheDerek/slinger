@@ -5,7 +5,7 @@ LevelScene::LevelScene(const std::string &level, sf::RenderWindow &window, entt:
     sceneDispatcher_(sceneDispatcher),
     physics_(registry_, dispatcher_),
     illustrator_(window_, registry_, dispatcher_),
-    inputManager_(window_, dispatcher_, registry_),
+    inputManager_(window_, dispatcher_, sceneDispatcher_, registry_),
     mapMaker_(registry_, physics_),
     checkpointManager_(registry_, dispatcher_, sceneDispatcher_)
 {

@@ -4,7 +4,6 @@
 #include "regexer.h"
 
 TEST(Regexer, CanGetMatches) {
-    //TODO Find a neater regex that trims the whitespace at the end of the matches
     Regexer regexer(R"(\s?([a-zA-Z])\s([^a-zA-Z]+\s))");
 
     auto matches = regexer.search("M 72.732231,91.993675 H 85.979527 L 72.732231,118.39366 Z");

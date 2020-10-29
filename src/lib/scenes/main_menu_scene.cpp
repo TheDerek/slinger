@@ -65,6 +65,11 @@ void MainMenuScene::step() {
         {
            reposition(event.size.width, event.size.height);
         }
+
+        if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape) {
+            SPDLOG_INFO("Closing game from main menu window with escape key");
+            sceneDispatcher_.enqueue(ExitGame());
+        }
     }
 
     window_.clear(sf::Color(100, 100, 100));

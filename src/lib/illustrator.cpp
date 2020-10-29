@@ -8,6 +8,7 @@
 #include <stdio.h>
 
 #include <entt/entity/helper.hpp>
+#include <spdlog/spdlog.h>
 
 Illustrator::Illustrator(sf::RenderWindow &window, entt::registry &registry, entt::dispatcher &dispatcher) :
     window_(window),
@@ -17,6 +18,7 @@ Illustrator::Illustrator(sf::RenderWindow &window, entt::registry &registry, ent
 {
     dispatcher_.sink<Event<FireRope>>().connect<&Illustrator::addRope>(*this);
     dispatcher_.sink<Event<Death>>().connect<&Illustrator::onPlayerDeath>(*this);
+    dispatcher.sink<ResizeWindow>().connect<&Illustrator::resizeWindow>(*this);
 
     registry_.on_construct<Drawable>().connect<&Illustrator::onAddDrawable>(this);
     registry_.on_destroy<Drawable>().connect<&Illustrator::onAddDrawable>(this);
@@ -90,6 +92,16 @@ void Illustrator::addRope(const Event<FireRope> &event) {
 
 void Illustrator::onPlayerDeath(const Event<Death> &event) {
     registry_.remove_if_exists<Follow>(event.entity);
+}
+
+void Illustrator::resizeWindow(ResizeWindow event) {
+    SPDLOG_INFO("Resizing game window to width={}, height={}", event.width, event.height);
+
+    //camera_.setSize(event.width, event.height);
+
+    // update the view to the new size of the window
+    sf::FloatRect visibleArea(0, 0, event.width, event.height);
+    window_.setView(sf::View(visibleArea));
 }
 
 bool operator>(const sf::Vector2f &lhs, const sf::Vector2f &rhs) {
