@@ -40,8 +40,8 @@ int main(int argc, char *argv[]) {
     auto settings = sf::ContextSettings();
     settings.antialiasingLevel = 8;
     sf::RenderWindow window(
-        sf::VideoMode(1000, 800),
-        "Slinger DEV build"
+        sf::VideoMode(1280, 720),
+        "Slinger"
     );
     window.setKeyRepeatEnabled(false);
 
