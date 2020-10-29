@@ -280,7 +280,7 @@ LevelInfo::LevelInfo(std::filesystem::path path, std::optional<sf::Time> complet
     if (completionTime) {
         displayName_ += "[" + formatTime(completionTime.value()) + "]";
     } else {
-        displayName_ + "[Not attempted]";
+        displayName_ += "[Not attempted]";
     }
 }
 
