@@ -46,6 +46,11 @@ void CheckpointManager::onCheckpoint(const EnteredCheckpoint &event) {
         SPDLOG_INFO("Entity {} has finished the level!", event.entity);
         despawn(event.entity, *respawnable);
         respawnable->finished = true;
+
+        if (Timeable* timeable = registry_.try_get<Timeable>(event.entity)) {
+            timeable->stop();
+        }
+
         dispatcher_.enqueue(Event<Death>(event.entity, Death {}));
     }
 }

@@ -9,7 +9,12 @@ const float MainMenuScene::MARGIN = 10;
 const float MenuItem::MARGIN = 10;
 const float MenuItem::PADDING = 5;
 
-MainMenuScene::MainMenuScene(const std::string& levelLocation, sf::RenderWindow &window, entt::dispatcher& sceneDispatcher):
+MainMenuScene::MainMenuScene(
+    const std::string& levelLocation,
+    sf::RenderWindow &window,
+    entt::dispatcher& sceneDispatcher,
+    const nlohmann::json& times
+):
     levelLocation_(levelLocation),
     sceneDispatcher_(sceneDispatcher),
     window_(window),
@@ -26,7 +31,7 @@ MainMenuScene::MainMenuScene(const std::string& levelLocation, sf::RenderWindow 
     titleText_.setString("Slinger!");
 
     menu_.addTitle("Select level to play");
-    for (const auto& level : getLevels(levelLocation)) {
+    for (const auto& level : getLevels(levelLocation, times)) {
         menu_.addItem(level.getDisplayName(), StartLevel(level.getPath()));
     }
     menu_.addSpacer();
@@ -87,12 +92,17 @@ void MainMenuScene::reposition(int width, int height) {
     authorText_.setPosition(x, y);
 }
 
-std::vector<LevelInfo> MainMenuScene::getLevels(const std::string& levelsLoc) {
+std::vector<LevelInfo> MainMenuScene::getLevels(const std::string& levelsLoc, const nlohmann::json& times) {
     std::vector<LevelInfo> levels;
 
     for(auto& p: std::filesystem::directory_iterator(levelsLoc)) {
         if (p.path().extension() == ".svg") {
-            levels.emplace_back(LevelInfo(p.path()));
+            std::optional<sf::Time> time;
+            if (times.contains(p.path())) {
+                time = sf::milliseconds(times[p.path()]);
+            }
+
+            levels.emplace_back(LevelInfo(p.path(), time));
         }
     }
 
@@ -262,8 +272,16 @@ void MenuItem::handleMousePress(float x, float y, entt::dispatcher &dispatcher) 
     }
 }
 
-LevelInfo::LevelInfo(std::filesystem::path path) : path_(path) {
-    displayName_ = path.replace_extension("").filename().generic_string() + " [Not attempted]";
+LevelInfo::LevelInfo(std::filesystem::path path, std::optional<sf::Time> completionTime):
+    path_(path), completionTime_(completionTime)
+{
+    displayName_ = path.replace_extension("").filename().generic_string() + " ";
+
+    if (completionTime) {
+        displayName_ += "[" + formatTime(completionTime.value()) + "]";
+    } else {
+        displayName_ + "[Not attempted]";
+    }
 }
 
 const std::string &LevelInfo::getDisplayName() const {

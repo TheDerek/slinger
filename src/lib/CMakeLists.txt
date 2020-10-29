@@ -30,6 +30,7 @@ find_package(SFML 2.5 COMPONENTS graphics audio system window REQUIRED)
 find_package(EnTT REQUIRED)
 find_package(pugixml REQUIRED)
 find_package(spdlog REQUIRED)
+find_package(nlohmann_json 3.2.0 REQUIRED)
 
 target_link_libraries(slingerlib PUBLIC
     sfml-graphics
@@ -40,4 +41,5 @@ target_link_libraries(slingerlib PUBLIC
     box2d
     pugixml
     spdlog::spdlog
+    nlohmann_json::nlohmann_json
 )

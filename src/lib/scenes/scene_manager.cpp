@@ -1,7 +1,12 @@
 #include <spdlog/spdlog.h>
+#include <fstream>
+
 #include "scene_manager.h"
 #include "main_menu_scene.h"
 #include "level_scene.h"
+
+const std::string SceneManager::LEVEL_PATH = "data/levels";
+const std::string SceneManager::LEVEL_TIMES_PATH = "data/times.json";
 
 SceneManager::SceneManager(sf::RenderWindow &window, std::optional<std::string> levelPath):
     window_(window)
@@ -11,7 +16,7 @@ SceneManager::SceneManager(sf::RenderWindow &window, std::optional<std::string> 
     sceneDispatcher_.sink<FinishLevel>().connect<&SceneManager::finishLevel>(this);
 
     if (!levelPath) {
-        scene_ = std::make_unique<MainMenuScene>("data/levels/", window, sceneDispatcher_);
+        openMainMenu();
     } else {
         sceneDispatcher_.trigger<StartLevel>(levelPath.value());
     }
@@ -37,5 +42,36 @@ void SceneManager::startLevel(const StartLevel &event) {
 
 void SceneManager::finishLevel(const FinishLevel &event) {
     SPDLOG_INFO("Finished level {} with time {}", lastLevelPath_, formatTime(event.completeTime));
-    scene_ = std::make_unique<MainMenuScene>("data/levels/", window_, sceneDispatcher_);
+    writeLevelTime(lastLevelPath_, event.completeTime);
+    openMainMenu();
+}
+
+void SceneManager::writeLevelTime(const std::string &levelPath, const sf::Time &levelTime) {
+    auto times = getLevelTimes();
+
+    if (times.contains(levelPath) && times[levelPath] < levelTime.asMilliseconds()) {
+        SPDLOG_INFO("Not writing time of {} for {} because the existing time of {} is less",
+            levelTime.asMilliseconds(), levelPath, times[levelPath].get<int>());
+        return;
+    }
+
+    times[levelPath] = levelTime.asMilliseconds();
+
+    std::ofstream outputFile(SceneManager::LEVEL_TIMES_PATH);
+    outputFile << std::setw(4) << times << std::endl;
+
+    SPDLOG_INFO("Written new time of {} for level {}", levelTime.asMilliseconds(), levelPath);
+}
+
+SceneManager::json SceneManager::getLevelTimes() {
+    std::ifstream inputFile(SceneManager::LEVEL_TIMES_PATH);
+    json times;
+    inputFile >> times;
+    inputFile.close();
+
+    return times;
+}
+
+void SceneManager::openMainMenu() {
+    scene_ = std::make_unique<MainMenuScene>(LEVEL_PATH, window_, sceneDispatcher_, getLevelTimes());
 }

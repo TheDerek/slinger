@@ -8,6 +8,7 @@
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <entt/signal/dispatcher.hpp>
 #include <filesystem>
+#include <nlohmann/json.hpp>
 
 #include "scene.h"
 
@@ -62,18 +63,13 @@ private:
 
 class LevelInfo {
     std::filesystem::path path_;
-public:
-    const std::filesystem::path &getPath() const;
-
-private:
     std::string displayName_;
-public:
-    const std::string &getDisplayName() const;
-
-private:
     std::optional<sf::Time> completionTime_;
+
 public:
-    LevelInfo(std::filesystem::path path);
+    explicit LevelInfo(std::filesystem::path path, std::optional<sf::Time> completionTime);
+    [[nodiscard]] const std::filesystem::path &getPath() const;
+    [[nodiscard]] const std::string &getDisplayName() const;
 };
 
 class MainMenuScene : public Scene {
@@ -89,12 +85,17 @@ class MainMenuScene : public Scene {
     Menu menu_;
 
 public:
-    explicit MainMenuScene(const std::string& levelLocation, sf::RenderWindow& window, entt::dispatcher& sceneDispatcher);
+    explicit MainMenuScene(
+        const std::string& levelLocation,
+        sf::RenderWindow& window,
+        entt::dispatcher& sceneDispatcher,
+        const nlohmann::json& times
+    );
     void step() override;
 
 private:
     void reposition(int width, int height);
-    std::vector<LevelInfo> getLevels(const std::string& levelsLoc);
+    std::vector<LevelInfo> getLevels(const std::string& levelsLoc, const nlohmann::json& times);
 };
 
 #endif //SLINGER_MAIN_MENU_SCENE_H

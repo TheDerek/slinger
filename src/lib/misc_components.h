@@ -55,6 +55,7 @@ struct Respawnable {
 class Timeable {
     sf::Clock clock_;
     bool clockStarted_ = false;
+    std::optional<sf::Time> stoppedTime;
     std::string display_;
 
 public:
@@ -65,6 +66,8 @@ public:
     }
 
     void startIfNotStarted() {
+        stoppedTime.reset();
+
         if (clockStarted_) {
             return;
         }
@@ -73,10 +76,16 @@ public:
         clock_.restart();
     }
 
+    void stop() {
+        stoppedTime = getElapsedTime();
+    }
+
     [[nodiscard]] const std::string &formatTime() {
         if (hasStarted()) {
-            int minutes = clock_.getElapsedTime().asSeconds() / 60;
-            float seconds = clock_.getElapsedTime().asSeconds() - (float) (minutes * 60);
+            sf::Time time = getElapsedTime();
+
+            int minutes = time.asSeconds() / 60;
+            float seconds = time.asSeconds() - (float) (minutes * 60);
 
             std::snprintf(&display_[0], display_.size() + 1, "%02d:%04.1f", minutes, seconds);
         } else {
@@ -86,6 +95,10 @@ public:
     }
 
     [[nodiscard]] sf::Time getElapsedTime() {
+        if (stoppedTime) {
+            return stoppedTime.value();
+        }
+
         return clock_.getElapsedTime();
     }
 };

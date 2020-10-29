@@ -24,9 +24,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="7.3896208"
-     inkscape:cx="596.08977"
-     inkscape:cy="92.645227"
+     inkscape:zoom="20.901004"
+     inkscape:cx="42.802501"
+     inkscape:cy="32.883694"
      inkscape:document-units="px"
      inkscape:current-layer="layer3"
      inkscape:document-rotation="0"
@@ -470,14 +470,6 @@
        y="86.097252"
        ry="0"
        inkscape:label="finish" />
-    <rect
-       style="opacity:1;fill:#0000ff;stroke:none;stroke-width:0.27496;stroke-opacity:1"
-       id="rect1438-1-0-6-3-6-7-5-3-5-6-3"
-       width="2.3128352"
-       height="53.635857"
-       x="612.64752"
-       y="86.097252"
-       ry="0" />
   </g>
   <g
      inkscape:groupmode="layer"
@@ -606,8 +598,8 @@
        id="player"
        width="1"
        height="2"
-       x="607.54205"
-       y="137.68744"
+       x="10.205802"
+       y="23.461966"
        ry="0" />
   </g>
 </svg>
