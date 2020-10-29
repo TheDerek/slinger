@@ -1,7 +1,6 @@
-box2d 2.4.0-1
-entt 3.5.1-1
-sfml 2.5.1-2
-pugixml 1.10-2
-spdlog 1.8.0-1
-nlohmann-json 3.9.1-1
-
+box2d
+entt
+sfml
+pugixml
+spdlog
+nlohmann-json

@@ -1,16 +1,12 @@
 .PHONY: run
 run: build
-	./build/slinger
+	./build/src/slinger
 
 .PHONY: build
 build:
+	./install-requirements.sh
+	mkdir -p build
 	cd ./build && cmake ../ && make -j 6
-
-.PHONY: vcpkg
-vcpkg:
-	cmake -B ./build/ -S . -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release
-	cmake --build ./build -j 10
-
 
 .PHONY: clean
 clean:
