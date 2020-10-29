@@ -153,6 +153,8 @@ void Menu::render() {
 
         std::get<MenuItem>(item).render(window_);
     }
+
+    window_.display();
 }
 
 void Menu::reposition() {

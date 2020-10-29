@@ -25,7 +25,7 @@ Physics::Physics(entt::registry &registry, entt::dispatcher &dispatcher) :
 
 }
 
-const float Physics::TIME_STEP = 1 / 60.f;
+const float Physics::TIME_STEP = 1 / 120.f;
 
 void Physics::handlePhysics(entt::registry &registry, float delta, const sf::Vector2f &mousePos) {
     world_.Step(TIME_STEP, 30, 15);

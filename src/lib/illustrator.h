@@ -19,6 +19,7 @@ struct Drawable {
 class Illustrator
 {
     sf::View camera_;
+    sf::View uiView_;
     sf::RenderWindow& window_;
     entt::dispatcher& dispatcher_;
     entt::registry& registry_;

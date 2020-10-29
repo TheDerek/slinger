@@ -16,6 +16,8 @@ Illustrator::Illustrator(sf::RenderWindow &window, entt::registry &registry, ent
     dispatcher_(dispatcher),
     camera_(sf::Vector2f(0.f, 0.f), sf::Vector2f(80.f, -60.f) / 2.f)
 {
+    window_.setFramerateLimit(60);
+
     dispatcher_.sink<Event<FireRope>>().connect<&Illustrator::addRope>(*this);
     dispatcher_.sink<Event<Death>>().connect<&Illustrator::onPlayerDeath>(*this);
     dispatcher.sink<ResizeWindow>().connect<&Illustrator::resizeWindow>(*this);
@@ -31,6 +33,8 @@ Illustrator::Illustrator(sf::RenderWindow &window, entt::registry &registry, ent
     text_.setFont(font_);
     text_.setCharacterSize(24);
     text_.setFillColor(sf::Color::White);
+
+    resizeWindow(ResizeWindow {window_.getSize().x, window_.getSize().y});
 }
 
 void Illustrator::onAddDrawable(entt::registry& registry, entt::entity entity) {
@@ -69,12 +73,12 @@ void Illustrator::draw(entt::registry &registry) {
         }
     );
 
-    window_.setView(window_.getDefaultView());
+    window_.setView(uiView_);
     registry.view<Follow, Timeable>().each(
         [this](const auto entity, const Follow& follow, Timeable& timeable) {
             text_.setString(timeable.formatTime());
             text_.setPosition(10, 10);
-            text_.setScale(1.f, 1.f);
+            //text_.setScale(1.f, 1.f);
             window_.draw(text_);
         }
     );
@@ -97,11 +101,16 @@ void Illustrator::onPlayerDeath(const Event<Death> &event) {
 void Illustrator::resizeWindow(ResizeWindow event) {
     SPDLOG_INFO("Resizing game window to width={}, height={}", event.width, event.height);
 
-    //camera_.setSize(event.width, event.height);
+    float fixedWidth = 60;
+    float aspectRatio = (float)event.width / (float)event.height;
+    float height = fixedWidth / aspectRatio;
 
-    // update the view to the new size of the window
-    sf::FloatRect visibleArea(0, 0, event.width, event.height);
-    window_.setView(sf::View(visibleArea));
+    camera_.setSize(fixedWidth, -height);
+
+    // update the ui view to the new size of the window
+    uiView_.setSize(event.width, event.height);
+    uiView_.setCenter(event.width /2, event.height/2);
+    //uiView_.setViewport(sf::FloatRect(0, 0, event.width, event.height));
 }
 
 bool operator>(const sf::Vector2f &lhs, const sf::Vector2f &rhs) {

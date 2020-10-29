@@ -26,7 +26,6 @@ SceneManager::SceneManager(sf::RenderWindow &window, std::optional<std::string> 
 void SceneManager::run() {
     while (!shouldExit_) {
         scene_->step();
-        window_.display();
         sceneDispatcher_.update();
     }
 }
