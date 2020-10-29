@@ -31,15 +31,26 @@ find_package(EnTT REQUIRED)
 find_package(pugixml REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(nlohmann_json 3.2.0 REQUIRED)
+find_package(OpenGL REQUIRED COMPONENTS OpenGL)
+find_package(GLUT REQUIRED)
 
-target_link_libraries(slingerlib PUBLIC
-    sfml-graphics
-    sfml-audio
-    sfml-system
-    sfml-window
-    ${EnTTTargets}
-    box2d
-    pugixml
-    spdlog::spdlog
-    nlohmann_json::nlohmann_json
+include(FindOpenGL)
+
+add_dependencies(slingerlib OpenGL::OpenGL)
+include_directories(${GLUT_INCLUDE_DIRS} )
+
+target_link_libraries(slingerlib
+    PUBLIC
+        OpenGL::OpenGL
+        OpenGL::GLX
+        ${GLUT_LIBRARY}
+        sfml-graphics
+        sfml-audio
+        sfml-system
+        sfml-window
+        ${EnTTTargets}
+        box2d
+        pugixml
+        spdlog::spdlog
+        nlohmann_json::nlohmann_json
 )
