@@ -33,6 +33,7 @@ class SceneManager {
     void startLevel(const StartLevel& event);
     void finishLevel(const FinishLevel& event);
     void exitLevel(const ExitLevel& event);
+    void openTutorial(const OpenTutorial& event);
 
 public:
     SceneManager(sf::RenderWindow& window, std::optional<std::string> levelPath);

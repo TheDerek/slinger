@@ -24,7 +24,8 @@ add_library(slingerlib
     scenes/main_menu_scene.h
     scenes/scene_manager.cpp
     scenes/scene_manager.h
-)
+        scenes/tutorial_scene.cpp
+        scenes/tutorial_scene.h)
 
 target_include_directories(slingerlib PUBLIC
     .

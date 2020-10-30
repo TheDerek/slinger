@@ -13,7 +13,7 @@
 
 #include "scene.h"
 
-using MenuAction = std::variant<ExitGame, StartLevel, std::monostate>;
+using MenuAction = std::variant<ExitGame, StartLevel, std::monostate, OpenTutorial>;
 
 class MenuItem {
     const static float PADDING;

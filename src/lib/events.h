@@ -63,6 +63,8 @@ struct FinishLevel {
 
 struct ExitLevel {};
 
+struct OpenTutorial {};
+
 struct ResizeWindow {
     unsigned int width;
     unsigned int height;

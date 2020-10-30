@@ -35,7 +35,7 @@ MainMenuScene::MainMenuScene(
         menu_.addItem(level.getDisplayName(), StartLevel(level.getPath().generic_string()));
     }
     menu_.addSpacer();
-    menu_.addItem("How to Play", std::monostate{});
+    menu_.addItem("How to Play", OpenTutorial());
     menu_.addItem("Exit", ExitGame());
 
     authorText_.setFont(font_);
@@ -270,12 +270,18 @@ void MenuItem::handleMousePress(float x, float y, entt::dispatcher &dispatcher) 
 
     SPDLOG_INFO("'{}' button clicked", std::string(label_.getString()));
 
+    // TODO: Find a way to template this out
+
     if (std::holds_alternative<ExitGame>(menuAction_)) {
         dispatcher.enqueue(std::get<ExitGame>(menuAction_));
     }
 
     if (std::holds_alternative<StartLevel>(menuAction_)) {
         dispatcher.enqueue(std::get<StartLevel>(menuAction_));
+    }
+
+    if (std::holds_alternative<OpenTutorial>(menuAction_)) {
+        dispatcher.enqueue(std::get<OpenTutorial>(menuAction_));
     }
 }
 

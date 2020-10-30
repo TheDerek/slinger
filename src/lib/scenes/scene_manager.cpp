@@ -4,6 +4,7 @@
 #include "scene_manager.h"
 #include "main_menu_scene.h"
 #include "level_scene.h"
+#include "tutorial_scene.h"
 
 const std::string SceneManager::LEVEL_PATH = "data/levels";
 const std::string SceneManager::LEVEL_TIMES_PATH = "data/times.json";
@@ -15,6 +16,7 @@ SceneManager::SceneManager(sf::RenderWindow &window, std::optional<std::string> 
     sceneDispatcher_.sink<StartLevel>().connect<&SceneManager::startLevel>(this);
     sceneDispatcher_.sink<FinishLevel>().connect<&SceneManager::finishLevel>(this);
     sceneDispatcher_.sink<ExitLevel>().connect<&SceneManager::exitLevel>(this);
+    sceneDispatcher_.sink<OpenTutorial>().connect<&SceneManager::openTutorial>(this);
 
     if (!levelPath) {
         openMainMenu();
@@ -82,4 +84,8 @@ void SceneManager::openMainMenu() {
 
 void SceneManager::exitLevel(const ExitLevel &event) {
     openMainMenu();
+}
+
+void SceneManager::openTutorial(const OpenTutorial& event) {
+    scene_ = std::make_unique<TutorialScene>(window_, sceneDispatcher_);
 }
